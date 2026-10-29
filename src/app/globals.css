@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* Paleta del laboratorio (sección 19.1): grafito oscuro con acentos azul eléctrico y violeta. */
+@theme {
+  --color-grafito-950: #0a0c10;
+  --color-grafito-900: #0f1218;
+  --color-grafito-850: #141820;
+  --color-grafito-800: #191e28;
+  --color-grafito-700: #232937;
+  --color-grafito-600: #2f3647;
+  --color-grafito-500: #454e63;
+  --color-grafito-400: #6b7489;
+  --color-acento: #4f8cff;
+  --color-acento-claro: #7aa8ff;
+  --color-violeta: #8b5cf6;
+  --color-senal-moduladora: #4f8cff;
+  --color-senal-portadora: #a78bfa;
+  --color-senal-modulada: #22d3ee;
+  --color-advertencia: #facc15;
+  --color-error: #f87171;
+  --color-exito: #4ade80;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-grafito-950);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Barras de desplazamiento discretas en los paneles. */
+.desplazable {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-grafito-600) transparent;
+}
+
+input[type="range"] {
+  accent-color: var(--color-acento);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* KaTeX: ecuaciones legibles sobre fondo oscuro y con desplazamiento horizontal si no caben. */
+.ecuacion .katex-display {
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+
+.ecuacion .katex {
+  font-size: 1.08em;
+  color: #f1f5f9;
+}
+
+.ecuacion-pequena .katex {
+  font-size: 0.95em;
+}
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] > summary .indicador-plegable {
+  transform: rotate(90deg);
+}
