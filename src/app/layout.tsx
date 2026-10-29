@@ -10,6 +10,7 @@ const descripcion =
   "Laboratorio interactivo para simular y visualizar modulaciones AM, ASK, PSK y PSM: señales en el tiempo, espectro por FFT y constelaciones.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://laboratorio-modulaciones.vercel.app"),
   title: { default: "Laboratorio Virtual de Modulaciones", template: "%s · Laboratorio de Modulaciones" },
   description: descripcion,
   applicationName: "Laboratorio Virtual de Modulaciones",

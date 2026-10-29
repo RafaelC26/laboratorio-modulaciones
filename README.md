@@ -1,13 +1,47 @@
+<div align="center">
+
+<img src="src/app/icon.svg" width="64" height="64" alt="" />
+
 # Laboratorio Virtual de Modulaciones
 
-Aplicación web educativa para simular y visualizar modulaciones **AM**, **ASK**, **PSK** (BPSK, QPSK, 8-PSK, 16-PSK) y **PSM**.
-Calcula las señales muestra a muestra a partir de sus ecuaciones y las muestra en el tiempo, en frecuencia (FFT) y en el plano I/Q.
+Simula y visualiza modulaciones **AM**, **ASK**, **PSK** (BPSK, QPSK, 8-PSK, 16-PSK) y **PSM**.<br />
+Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muestran en el tiempo, en frecuencia (FFT) y en el plano I/Q.
 
-Tecnologías: Next.js 15, React 19, TypeScript, Plotly.js, KaTeX, Zustand, Tailwind CSS 4 y Vitest.
+**[Abrir el laboratorio en línea →](https://laboratorio-modulaciones.vercel.app/laboratorio)** · [laboratorio-modulaciones.vercel.app](https://laboratorio-modulaciones.vercel.app)
+
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly.js-2-3F4F75?logo=plotly&logoColor=white)
+![KaTeX](https://img.shields.io/badge/KaTeX-0.19-329894)
+![Pruebas](https://img.shields.io/badge/pruebas-47%20Vitest-6E9F18?logo=vitest&logoColor=white)
+![Vercel](https://img.shields.io/badge/desplegado%20en-Vercel-000000?logo=vercel&logoColor=white)
+
+</div>
+
+![Modulación AM: moduladora, portadora, señal modulada con su envolvente y panel de ecuaciones](docs/captura-am.png)
+
+### Abrir una técnica directamente
+
+| Técnica | Qué se ve | Enlace |
+|---|---|---|
+| **AM** | Envolvente, sobremodulación, portadora y bandas laterales | [`/laboratorio?tecnica=AM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=AM) |
+| **ASK** | OOK, amplitud por bit, lóbulo espectral | [`/laboratorio?tecnica=ASK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=ASK) |
+| **PSK** | Saltos de fase, constelación I/Q, mapeo Gray | [`/laboratorio?tecnica=PSK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSK) |
+| **PSM** | Frecuencia instantánea, rayas de Bessel, regla de Carson | [`/laboratorio?tecnica=PSM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSM) |
+
+![Modulación BPSK: secuencia de bits con la fase de cada símbolo, portadora de referencia y señal modulada](docs/captura-psk.png)
 
 ## Puesta en marcha
 
 Requiere Node.js 20 o superior.
+
+```bash
+git clone https://github.com/RafaelC26/laboratorio-modulaciones.git
+```
+
+```bash
+cd laboratorio-modulaciones
+```
 
 ```bash
 npm install
@@ -18,6 +52,10 @@ npm run dev
 ```
 
 Abra http://localhost:3000 y pulse **Entrar al laboratorio** (o vaya directamente a `/laboratorio`).
+
+### Despliegue
+
+El proyecto está conectado a Vercel: cada `git push` a `main` publica una nueva versión en https://laboratorio-modulaciones.vercel.app (las demás ramas generan vistas previas).
 
 Otros comandos:
 
