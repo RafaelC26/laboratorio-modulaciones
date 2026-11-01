@@ -4,13 +4,6 @@ import { LogoLaboratorio } from "@/componentes/interfaz/EncabezadoAplicacion";
 import { configuracionGeneral, tecnicasDisponibles } from "@/configuracion/configuracionGeneral";
 import { obtenerConjuntoFormulas } from "@/formulas/repositorioFormulas";
 
-const CAPACIDADES = [
-  "Señales moduladora, portadora y modulada calculadas muestra a muestra",
-  "Espectro por FFT con ventanas y contraste con valores teóricos",
-  "Constelaciones I/Q y tablas de mapeo para ASK y PSK",
-  "Comparación de configuraciones y exportación CSV, JSON, reporte y PNG",
-];
-
 export default function PaginaInicio() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-6xl flex-col px-4 py-10 sm:px-6 lg:py-16">
@@ -54,14 +47,6 @@ export default function PaginaInicio() {
               <EcuacionModulacion latex={obtenerConjuntoFormulas(tecnica.tipo).principal.ecuacion} />
             </div>
           </article>
-        ))}
-      </section>
-
-      <section aria-label="Capacidades" className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {CAPACIDADES.map((capacidad) => (
-          <p key={capacidad} className="rounded-lg border border-grafito-700/60 bg-grafito-900/50 p-4 text-sm text-slate-400">
-            {capacidad}
-          </p>
         ))}
       </section>
 
