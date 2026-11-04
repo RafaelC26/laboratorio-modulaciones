@@ -6,6 +6,8 @@ import { useSimulacion } from "@/hooks/useSimulacion";
 import { normalizarAngulo, radianesAGrados } from "@/utilidades/conversionUnidades";
 import { formatearNumero } from "@/utilidades/formatoNumerico";
 
+const NOMBRES_MAPEO = { apuntes: "de los apuntes (Tema 6)", gray: "Gray", binario: "binario natural" } as const;
+
 /** Mapeo de bits a estados (fase o amplitud) y coordenadas I/Q de cada símbolo. */
 export function TablaSimbolos() {
   const { resultado } = useSimulacion();
@@ -16,7 +18,7 @@ export function TablaSimbolos() {
   return (
     <Tarjeta
       titulo="Tabla de símbolos"
-      subtitulo={esPSK ? `Mapeo ${resultado.parametros.mapeoSimbolos === "gray" ? "Gray" : "binario"} · φᵢ = 2πi/M + φ₀` : "A_i según el bit"}
+      subtitulo={esPSK ? `Mapeo ${NOMBRES_MAPEO[resultado.parametros.mapeoSimbolos]} · φᵢ = i·θ + φ₀, θ = 2π/N` : "Aᵢ según el bit"}
       plegable
     >
       <div className="overflow-x-auto">

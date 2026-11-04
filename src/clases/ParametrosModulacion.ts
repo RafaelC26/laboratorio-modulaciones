@@ -32,15 +32,15 @@ export class ParametrosModulacion implements CamposParametros {
   readonly faseInicial: number;
   readonly amplitudModuladora: number;
   readonly frecuenciaModuladora: number;
-  /** AM: μ = A_m/A_c. PSM: β = k_p·A_m [rad]. Digitales: null. */
+  /** AM: m = V_m/V_p. PSM: β = ΔΦ·V_m [rad]. Digitales: null. */
   readonly indiceModulacion: number | null;
   readonly sensibilidadFase: number;
   readonly secuenciaBits: number[];
   readonly amplitudBit1: number;
   readonly amplitudBit0: number;
-  /** ASK: T_b. PSK: T_s. */
+  /** ASK: T_bit. PSK: T. */
   readonly duracionSimbolo: number;
-  /** Número de estados M. */
+  /** Número de estados N. */
   readonly ordenModulacion: number;
   readonly mapeoSimbolos: MapeoSimbolos;
 
@@ -90,7 +90,7 @@ export class ParametrosModulacion implements CamposParametros {
         return new ParametrosModulacion({
           ...base,
           tipoModulacion: "ASK",
-          // La portadora de referencia usa la mayor de las dos amplitudes (A_1 en OOK).
+          // La portadora de referencia usa la mayor de las dos amplitudes (A_1 = V_p en OOK).
           amplitudPortadora: Math.max(Math.abs(entrada.amplitudBit1), Math.abs(entrada.amplitudBit0)),
           frecuenciaPortadora: entrada.frecuenciaPortadora,
           faseInicial: entrada.faseInicial,
@@ -127,22 +127,22 @@ export class ParametrosModulacion implements CamposParametros {
     }
   }
 
-  /** k = log₂M */
+  /** k = log₂N */
   get bitsPorSimbolo(): number {
     return Math.max(1, Math.round(Math.log2(this.ordenModulacion)));
   }
 
-  /** R_s = 1/T_s */
+  /** Velocidad de modulación: 1/T [Bd] */
   get tasaSimbolos(): number {
     return this.duracionSimbolo > 0 ? 1 / this.duracionSimbolo : 0;
   }
 
-  /** R_b = k·R_s */
+  /** Velocidad de transmisión: V_t = k/T [bit/s] */
   get tasaBits(): number {
     return this.bitsPorSimbolo * this.tasaSimbolos;
   }
 
-  /** T_b = T_s / k */
+  /** T_bit = T / k */
   get duracionBit(): number {
     return this.duracionSimbolo / this.bitsPorSimbolo;
   }

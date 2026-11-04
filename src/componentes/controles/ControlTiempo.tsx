@@ -117,7 +117,7 @@ export function ControlTiempo({ tipo }: { tipo: TipoModulacion }) {
           <dd className="text-right font-mono text-slate-300">
             {informacion.configuracion.cantidadMuestras ? formatearConUnidad(fs / informacion.configuracion.cantidadMuestras, "Hz") : "—"}
           </dd>
-          <dt className="text-slate-500">Muestras por ciclo de f_c</dt>
+          <dt className="text-slate-500">Muestras por ciclo de f_p</dt>
           <dd className="text-right font-mono text-slate-300">{formatearNumero(fs / informacion.frecuenciaPortadora, 3)}</dd>
           <dt className="text-slate-500">f_s / f_max</dt>
           <dd className="text-right font-mono text-slate-300">{formatearNumero(fs / informacion.frecuenciaMaxima, 3)}</dd>

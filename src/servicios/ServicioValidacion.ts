@@ -67,8 +67,8 @@ export class ServicioValidacion {
         revisar("frecuenciaModuladora", entrada.frecuenciaModuladora, "positivo");
         revisar("faseInicial", entrada.faseInicial, "finito");
         revisarTemporalAnalogico();
-        const mu = indiceModulacionAM(entrada);
-        if (mu > 1) aviso("amplitudModuladora", `μ = ${formatearNumero(mu)} > 1: se producirá sobremodulación.`);
+        const m = indiceModulacionAM(entrada);
+        if (m > 1) aviso("amplitudModuladora", `m = ${formatearNumero(m)} > 1: se producirá sobremodulación.`);
         if (entrada.frecuenciaModuladora >= entrada.frecuenciaPortadora) {
           aviso("frecuenciaModuladora", "La frecuencia moduladora debería ser bastante menor que la de la portadora.");
         }
@@ -89,10 +89,10 @@ export class ServicioValidacion {
       case "PSK": {
         revisarBits(entrada.secuenciaBits);
         if (!(configuracionGeneral.ordenesPSK as readonly number[]).includes(entrada.ordenModulacion)) {
-          error("ordenModulacion", `El orden M debe ser uno de: ${configuracionGeneral.ordenesPSK.join(", ")}.`);
+          error("ordenModulacion", `El orden N debe ser uno de: ${configuracionGeneral.ordenesPSK.join(", ")}.`);
         }
-        if (entrada.mapeoSimbolos !== "binario" && entrada.mapeoSimbolos !== "gray") {
-          error("mapeoSimbolos", "El mapeo debe ser binario o Gray.");
+        if (!["apuntes", "gray", "binario"].includes(entrada.mapeoSimbolos)) {
+          error("mapeoSimbolos", "El mapeo debe ser el de los apuntes, Gray o binario.");
         }
         revisar("amplitudPortadora", entrada.amplitudPortadora, "positivo");
         revisar("frecuenciaPortadora", entrada.frecuenciaPortadora, "positivo");
@@ -113,7 +113,7 @@ export class ServicioValidacion {
         revisarTemporalAnalogico();
         const beta = indiceModulacionFase(entrada);
         const limiteBeta = limitesParametros.indiceModulacionFase.maximo;
-        if (beta > limiteBeta) error("sensibilidadFase", `β = k_p·A_m = ${formatearNumero(beta)} rad supera el máximo de ${limiteBeta} rad.`);
+        if (beta > limiteBeta) error("sensibilidadFase", `β = ΔΦ·V_m = ${formatearNumero(beta)} rad supera el máximo de ${limiteBeta} rad.`);
         if (entrada.frecuenciaModuladora >= entrada.frecuenciaPortadora) {
           aviso("frecuenciaModuladora", "La frecuencia moduladora debería ser bastante menor que la de la portadora.");
         }

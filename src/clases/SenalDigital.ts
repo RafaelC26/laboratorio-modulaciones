@@ -3,7 +3,7 @@ import { limpiarSecuenciaBits } from "@/utilidades/validacionNumerica";
 
 /**
  * Secuencia digital de información con su temporización.
- * El bit i ocupa el intervalo [i·T_b, (i+1)·T_b).
+ * El bit i ocupa el intervalo [i·T_bit, (i+1)·T_bit).
  */
 export class SenalDigital {
   readonly bits: number[];

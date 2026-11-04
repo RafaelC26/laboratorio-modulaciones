@@ -3,7 +3,7 @@ import type { TipoModulacion } from "./tiposModulacion";
 
 /** Variable que aparece en una ecuación. */
 export interface VariableFormula {
-  /** Símbolo en LaTeX, por ejemplo "A_c". */
+  /** Símbolo en LaTeX, por ejemplo "V_p". */
   simbolo: string;
   descripcion: string;
   unidad: string;
@@ -22,6 +22,11 @@ export interface DefinicionFormula {
   /** Unidad del resultado de la fórmula. */
   unidad: string;
   version: string;
+  /**
+   * Página impresa del Tema 6 (apuntes del curso) donde aparece la fórmula.
+   * Si no se indica, es un complemento que no está en el Tema 6.
+   */
+  paginaTema6?: string;
 }
 
 /** Conjunto de fórmulas de una técnica: la principal y sus complementarias. */

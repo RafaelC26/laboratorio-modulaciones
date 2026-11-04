@@ -43,7 +43,14 @@ export function PanelResultados() {
                 </span>
               )}
             </dt>
-            <dd className={`text-right font-mono whitespace-nowrap tabular-nums ${COLOR_ESTADO[metrica.estado ?? "normal"]}`}>{valorMetrica(metrica)}</dd>
+            <dd className={`text-right font-mono whitespace-nowrap tabular-nums ${COLOR_ESTADO[metrica.estado ?? "normal"]}`}>
+              {metrica.complemento && (
+                <span title="Complemento: no está en el Tema 6" className="mr-1.5 rounded bg-grafito-800 px-1 py-px font-sans text-[10px] text-slate-500">
+                  compl.
+                </span>
+              )}
+              {valorMetrica(metrica)}
+            </dd>
           </div>
         ))}
       </dl>

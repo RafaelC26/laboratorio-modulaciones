@@ -1,11 +1,13 @@
 import type { ParametrosModulacion } from "@/clases/ParametrosModulacion";
 import { SenalAnalogica } from "@/clases/SenalAnalogica";
-import { senalPortadora } from "@/formulas/formulasPortadora";
+import { portadoraCoseno } from "@/formulas/formulasPortadora";
 import {
+  anchoBandaAngostaPM,
   anchoBandaCarson,
+  anchoBandaEstimadoPM,
   besselJ,
   desviacionFrecuenciaPSM,
-  esBandaEstrecha,
+  esBandaAngosta,
   frecuenciaInstantaneaPSM,
   frecuenciaMaximaPSM,
   indiceModulacionFase,
@@ -35,56 +37,58 @@ export class MotorModulacionPSM implements MotorModulacion {
 
   calcular(p: ParametrosModulacion, tiempo: Float64Array): DatosModulacion {
     const beta = p.indiceModulacion ?? indiceModulacionFase(p);
-    const ac = p.amplitudPortadora;
-    const fc = p.frecuenciaPortadora;
+    const vp = p.amplitudPortadora;
+    const fp = p.frecuenciaPortadora;
     const fm = p.frecuenciaModuladora;
 
     const moduladora = MotorMuestreo.evaluar(tiempo, (t) => senalModuladoraPSM(t, p));
-    const portadora = MotorMuestreo.evaluar(tiempo, (t) => senalPortadora(t, p));
+    const portadora = MotorMuestreo.evaluar(tiempo, (t) => portadoraCoseno(t, p));
     const modulada = MotorMuestreo.evaluar(tiempo, (t) => senalModuladaPSM(t, p));
     const frecuenciaInstantanea = MotorMuestreo.evaluar(tiempo, (t) => frecuenciaInstantaneaPSM(t, p));
 
     const componentes: ComponenteEspectralTeorica[] = [];
     const maximoOrden = Math.ceil(beta) + 6;
     for (let n = -maximoOrden; n <= maximoOrden; n++) {
-      const frecuencia = fc + n * fm;
-      const amplitud = ac * Math.abs(besselJ(n, beta));
-      if (frecuencia <= 0 || amplitud < UMBRAL_COMPONENTE_BESSEL * ac) continue;
-      const etiqueta = n === 0 ? "Portadora A_c|J₀(β)|" : `f_c ${n > 0 ? "+" : "−"} ${Math.abs(n)}f_m: A_c|J${Math.abs(n)}(β)|`;
+      const frecuencia = fp + n * fm;
+      const amplitud = vp * Math.abs(besselJ(n, beta));
+      if (frecuencia <= 0 || amplitud < UMBRAL_COMPONENTE_BESSEL * vp) continue;
+      const etiqueta = n === 0 ? "Portadora V_p|J₀(β)|" : `f_p ${n > 0 ? "+" : "−"} ${Math.abs(n)}f_m: V_p|J${Math.abs(n)}(β)|`;
       componentes.push({ frecuencia, amplitud, etiqueta });
     }
 
     const deltaF = desviacionFrecuenciaPSM(p);
     const carson = anchoBandaCarson(beta, fm);
+    const angosta = esBandaAngosta(beta);
     const j0 = besselJ(0, beta);
-    const senalModulada = new SenalAnalogica("Señal PSM s(t)", tiempo, modulada, fc);
+    const senalModulada = new SenalAnalogica("Señal PSM v(t)", tiempo, modulada, fp);
 
     const metricas: Metrica[] = [
-      { clave: "indice", nombre: "Índice de modulación de fase", simbolo: String.raw`\beta=k_pA_m`, valor: beta, unidad: "rad" },
-      { clave: "indiceGrados", nombre: "Desviación máxima de fase", simbolo: String.raw`\Delta\phi_{max}`, valor: radianesAGrados(beta), unidad: "°" },
-      { clave: "regimen", nombre: "Régimen", valor: esBandaEstrecha(beta) ? "Banda estrecha (β < 0.3)" : "Banda ancha" },
-      { clave: "desviacionFrecuencia", nombre: "Desviación máxima de frecuencia", simbolo: String.raw`\Delta f=\beta f_m`, valor: deltaF, unidad: "Hz" },
-      { clave: "frecuenciaMaxima", nombre: "Frecuencia instantánea máxima", simbolo: String.raw`f_c+\Delta f`, valor: fc + deltaF, unidad: "Hz" },
-      { clave: "frecuenciaMinima", nombre: "Frecuencia instantánea mínima", simbolo: String.raw`f_c-\Delta f`, valor: fc - deltaF, unidad: "Hz" },
-      { clave: "anchoBanda", nombre: "Ancho de banda (Carson)", simbolo: String.raw`2(\beta+1)f_m`, valor: carson, unidad: "Hz" },
-      { clave: "bessel0", nombre: "Amplitud relativa de portadora", simbolo: String.raw`J_0(\beta)`, valor: j0 },
-      { clave: "bessel1", nombre: "Primer par de bandas", simbolo: String.raw`J_1(\beta)`, valor: besselJ(1, beta) },
-      { clave: "bessel2", nombre: "Segundo par de bandas", simbolo: String.raw`J_2(\beta)`, valor: besselJ(2, beta) },
-      { clave: "fraccionPortadora", nombre: "Potencia en la portadora", simbolo: String.raw`J_0^2(\beta)`, valor: formatearPorcentaje(j0 * j0) },
-      { clave: "potenciaTotal", nombre: "Potencia total (constante)", simbolo: "A_c^2/2", valor: (ac * ac) / 2, unidad: "W" },
-      { clave: "potenciaMedida", nombre: "Potencia media medida", simbolo: String.raw`\overline{s^2}`, valor: senalModulada.potenciaMedia, unidad: "W" },
+      { clave: "indice", nombre: "Índice de modulación", simbolo: String.raw`\beta=\Delta\Phi\,V_m`, valor: beta, unidad: "rad" },
+      { clave: "indiceGrados", nombre: "Variación máxima de fase", simbolo: String.raw`\Phi_{max}=V_m\Delta\Phi`, valor: radianesAGrados(beta), unidad: "°" },
+      { clave: "regimen", nombre: "Régimen", valor: angosta ? "Banda angosta (β < π/2)" : "Banda ancha (β > π/2)" },
+      ...(angosta ? ([{ clave: "anchoBanda", nombre: "Ancho de banda", simbolo: "BW=2f_m", valor: anchoBandaAngostaPM(fm), unidad: "Hz" }] satisfies Metrica[]) : []),
+      { clave: "anchoBandaCarson", nombre: "Ancho de banda (Carson)", simbolo: String.raw`2(\beta+1)f_m`, valor: carson, unidad: "Hz", complemento: true },
+      { clave: "desviacionFrecuencia", nombre: "Desviación máxima de frecuencia", simbolo: String.raw`\Delta f=\beta f_m`, valor: deltaF, unidad: "Hz", complemento: true },
+      { clave: "frecuenciaMaxima", nombre: "Frecuencia instantánea máxima", simbolo: String.raw`f_p+\Delta f`, valor: fp + deltaF, unidad: "Hz", complemento: true },
+      { clave: "frecuenciaMinima", nombre: "Frecuencia instantánea mínima", simbolo: String.raw`f_p-\Delta f`, valor: fp - deltaF, unidad: "Hz", complemento: true },
+      { clave: "bessel0", nombre: "Amplitud relativa de portadora", simbolo: String.raw`J_0(\beta)`, valor: j0, complemento: true },
+      { clave: "bessel1", nombre: "Primer par de bandas", simbolo: String.raw`J_1(\beta)`, valor: besselJ(1, beta), complemento: true },
+      { clave: "bessel2", nombre: "Segundo par de bandas", simbolo: String.raw`J_2(\beta)`, valor: besselJ(2, beta), complemento: true },
+      { clave: "fraccionPortadora", nombre: "Potencia en la portadora", simbolo: String.raw`J_0^2(\beta)`, valor: formatearPorcentaje(j0 * j0), complemento: true },
+      { clave: "potenciaTotal", nombre: "Potencia total (constante)", simbolo: "V_p^2/2", valor: (vp * vp) / 2, unidad: "W", complemento: true },
+      { clave: "potenciaMedida", nombre: "Potencia media medida", simbolo: String.raw`\overline{v^2}`, valor: senalModulada.potenciaMedia, unidad: "W", complemento: true },
     ];
 
     const advertencias: string[] = [];
-    if (fc - (beta + 1) * fm <= 0) {
-      advertencias.push("Parte del ancho de banda de Carson cae en frecuencias negativas (f_c ≤ (β+1)f_m): las rayas se pliegan en el espectro.");
+    if (fp - (beta + 1) * fm <= 0) {
+      advertencias.push("Parte del ancho de banda de Carson cae en frecuencias negativas (f_p ≤ (β+1)f_m): las rayas se pliegan en el espectro.");
     }
     if (beta > 10) advertencias.push("β > 10: la serie de Bessel pierde precisión y el ancho de banda es muy grande.");
 
     return {
-      nombreVariante: esBandaEstrecha(beta) ? "PM de banda estrecha" : "PM de banda ancha",
-      moduladora: new SenalAnalogica("Moduladora m(t)", tiempo, moduladora, fm),
-      portadora: new SenalAnalogica("Portadora c(t)", tiempo, portadora, fc),
+      nombreVariante: angosta ? "PM de banda angosta" : "PM de banda ancha",
+      moduladora: new SenalAnalogica("Moduladora vm(t)", tiempo, moduladora, fm),
+      portadora: new SenalAnalogica("Portadora vp(t)", tiempo, portadora, fp),
       modulada: senalModulada,
       auxiliares: [
         {
@@ -98,10 +102,10 @@ export class MotorModulacionPSM implements MotorModulacion {
       ],
       metricas,
       resumen: {
-        amplitudMaxima: ac,
-        amplitudMinima: ac,
-        frecuenciaCentral: fc,
-        anchoBandaEstimado: carson,
+        amplitudMaxima: vp,
+        amplitudMinima: vp,
+        frecuenciaCentral: fp,
+        anchoBandaEstimado: anchoBandaEstimadoPM(beta, fm),
         tasaBits: null,
         tasaSimbolos: null,
         estados: null,

@@ -16,7 +16,16 @@ export function GraficaConstelacion({ resultado }: { resultado: ResultadoSimulac
     <Tarjeta titulo="Diagrama de constelación" color={coloresSenales.modulada} subtitulo={`${resultado.constelacion.length} estados · ${resultado.nombreVariante}`}>
       <GraficaPlotly datos={figura.datos} diseno={figura.diseno} identificador="constelacion" />
       <div className="mt-1 text-[11px] text-slate-500">
-        Convención: <EcuacionModulacion latex={String.raw`s(t)=I\cos(2\pi f_ct)-Q\sin(2\pi f_ct)`} enLinea className="ecuacion-pequena text-slate-400" />
+        Complemento, no está en el Tema 6. Convención:{" "}
+        <EcuacionModulacion
+          latex={
+            resultado.tipo === "ASK"
+              ? String.raw`v(t)=I\operatorname{sen}(2\pi f_pt+\phi_p)`
+              : String.raw`v(t)=I\cos(2\pi f_pt)-Q\operatorname{sen}(2\pi f_pt)`
+          }
+          enLinea
+          className="ecuacion-pequena text-slate-400"
+        />
       </div>
     </Tarjeta>
   );

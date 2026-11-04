@@ -4,7 +4,7 @@
 
 # Laboratorio Virtual de Modulaciones
 
-Simula y visualiza modulaciones **AM**, **ASK**, **PSK** (BPSK, QPSK, 8-PSK, 16-PSK) y **PSM**.<br />
+Simula y visualiza modulaciones **AM**, **ASK**, **PSK** (2PSK, 4PSK, 8PSK, 16PSK) y **PSM** (modulación de fase) con las fórmulas del Tema 6 del curso.<br />
 Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muestran en el tiempo, en frecuencia (FFT) y en el plano I/Q.
 
 **[Abrir el laboratorio en línea →](https://laboratorio-modulaciones.vercel.app/laboratorio)** · [laboratorio-modulaciones.vercel.app](https://laboratorio-modulaciones.vercel.app)
@@ -13,7 +13,7 @@ Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muest
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Plotly](https://img.shields.io/badge/Plotly.js-2-3F4F75?logo=plotly&logoColor=white)
 ![KaTeX](https://img.shields.io/badge/KaTeX-0.19-329894)
-![Pruebas](https://img.shields.io/badge/pruebas-47%20Vitest-6E9F18?logo=vitest&logoColor=white)
+![Pruebas](https://img.shields.io/badge/pruebas-68%20Vitest-6E9F18?logo=vitest&logoColor=white)
 ![Vercel](https://img.shields.io/badge/desplegado%20en-Vercel-000000?logo=vercel&logoColor=white)
 
 </div>
@@ -24,12 +24,12 @@ Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muest
 
 | Técnica | Qué se ve | Enlace |
 |---|---|---|
-| **AM** | Envolvente, sobremodulación, portadora y bandas laterales | [`/laboratorio?tecnica=AM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=AM) |
-| **ASK** | OOK, amplitud por bit, lóbulo espectral | [`/laboratorio?tecnica=ASK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=ASK) |
-| **PSK** | Saltos de fase, constelación I/Q, mapeo Gray | [`/laboratorio?tecnica=PSK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSK) |
-| **PSM** | Frecuencia instantánea, rayas de Bessel, regla de Carson | [`/laboratorio?tecnica=PSM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSM) |
+| **AM** | Envolvente, sobremodulación, portadora y frecuencias laterales | [`/laboratorio?tecnica=AM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=AM) |
+| **ASK** | Portadora presente o ausente, amplitud por bit, espectro sen x/x | [`/laboratorio?tecnica=ASK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=ASK) |
+| **PSK** | Saltos de fase, señal multinivel, constelación I/Q | [`/laboratorio?tecnica=PSK`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSK) |
+| **PSM** | Fase proporcional a la moduladora, índice β, banda angosta y ancha | [`/laboratorio?tecnica=PSM`](https://laboratorio-modulaciones.vercel.app/laboratorio?tecnica=PSM) |
 
-![Modulación BPSK: secuencia de bits con la fase de cada símbolo, portadora de referencia y señal modulada](docs/captura-psk.png)
+![Modulación 2PSK: moduladora con la fase de cada símbolo, portadora de referencia y señal modulada](docs/captura-psk.png)
 
 ## Puesta en marcha
 
@@ -69,14 +69,36 @@ Otros comandos:
 
 - Elegir la técnica y configurar sus parámetros con validación en vivo (campos con unidades Hz/kHz/MHz, s/ms/µs, °/rad).
 - Ver la señal moduladora (o la secuencia digital), la portadora y la señal modulada, con zoom sincronizado entre las tres.
-- AM: envolvente y zonas de **sobremodulación** marcadas en rojo cuando μ > 1.
-- PSK: fase de cada símbolo, límites de símbolo, etiquetas de bits, **constelación** y tabla de mapeo (binario o Gray).
-- PSM: frecuencia instantánea y espectro de Bessel.
+- AM: envolvente, porcentaje de modulación M y zonas de **sobremodulación** marcadas en rojo cuando M > 100 %.
+- PSK: moduladora bipolar o multinivel, fase de cada símbolo, etiquetas de bits, **constelación** y tabla de mapeo (apuntes, Gray o binario).
+- PSM: índice β, banda angosta o ancha, frecuencia instantánea y espectro de Bessel.
 - Espectro por FFT exacta de N puntos (radix-2 o Bluestein), con ventanas rectangular, Hann, Hamming y Blackman, escala lineal o dB, y **marcadores teóricos** para contrastar.
 - Modo dinámico (recalcula al cambiar un parámetro) o manual (botón **Ejecutar**, atajo `Ctrl + Enter`).
 - Comparar hasta 6 simulaciones: tabla de resultados y superposición de señales y espectros con la misma escala.
 - Exportar datos (CSV), parámetros y resultados (JSON), un reporte (Markdown) y las gráficas (PNG).
 - Historial de simulaciones anteriores (guardado en el navegador).
+- Cada fórmula indica su fuente: la página del Tema 6 o «Complemento» si no está en los apuntes.
+
+## Fórmulas del Tema 6
+
+Las ecuaciones siguen los apuntes del curso (*Tema 6. Representación de información*) y usan su notación. Las páginas son las impresas al pie del documento.
+
+| Técnica | Portadora | Moduladora | Señal modulada | Pág. |
+|---|---|---|---|---|
+| **AM** | `Vp·sen(2π fp t)` | `Vm·sen(2π fm t)` | `Vp[1 + m·sen(2π fm t)]·sen(2π fp t)`, con `m = Vm/Vp` | 35–36 |
+| **ASK** | `Vp·sen(2π fp t)` | 1 para un "1", 0 para un "0" | `Vp·vm(t)·sen(2π fp t)` | 49–50 |
+| **2PSK** | `Vp·cos(2π fp t)` | 1 para un "1", −1 para un "0" | `vp(t)·vm(t)`: fase 0 para un "1", fase π para un "0" | 54–55 |
+| **MPSK** | `Vp·cos(2π fp t)` | señal multinivel | fases separadas `θ = 2π/N`, `Vt = (1/T)·log₂N`, `BW = 1/T` | 55–58 |
+| **PSM (PM)** | `Vp·cos(2π fp t)` | `Vm·sen(2π fm t)` | `Vp·cos[2π fp t + β·sen(2π fm t)]`, con `β = ΔΦ·Vm` | 47–48 |
+
+Lo que se añadió y no está en los apuntes aparece marcado como **Complemento** en la aplicación:
+
+- **Parámetros:** la fase inicial `φp` y la fase de referencia `φ0`, que valen 0 por defecto, y las amplitudes `A1` y `A0` libres en ASK (con `A1 = Vp` y `A0 = 0` se obtiene la expresión del Tema 6).
+- **AM:** `Pp = Vp²/2R`, la eficiencia y la envolvente como curva.
+- **ASK:** `BW = 2/Tbit`, la energía por bit y la profundidad de modulación.
+- **PSK:** las componentes I/Q, la distancia mínima, la energía, la eficiencia espectral y el mapeo Gray.
+- **PSM:** la frecuencia instantánea, las rayas de Bessel y la regla de Carson.
+- **Análisis:** la FFT con sus ventanas y el criterio `fs ≥ 10·fmax`.
 
 ## Dónde se cambian las fórmulas
 
@@ -95,11 +117,13 @@ Para modificar, por ejemplo, la ecuación de AM, se edita `senalModuladaAM` y la
 
 ### Sobre PSM
 
-En este curso, PSM es la **modulación de fase analógica** (Phase Shift Modulation, PM), la contraparte analógica de PSK del mismo modo que AM lo es de ASK:
+En este curso, PSM es la **modulación de fase analógica**, que el Tema 6 llama PM (p. 46):
 
 ```
-s(t) = A_c · cos(2π f_c t + φ_c + k_p · m(t)),   m(t) = A_m · cos(2π f_m t),   β = k_p · A_m
+v(t) = Vp · cos[2π fp t + ΔΦ · vm(t)],   vm(t) = Vm · sen(2π fm t),   β = ΔΦ · Vm
 ```
+
+Es de banda angosta si `β < π/2`, y entonces `BW = 2 fm` (p. 45 y 48).
 
 Sus ecuaciones están en `src/formulas/formulasPSM.ts`; las señales auxiliares que se dibujan (frecuencia instantánea) salen de `src/motores/MotorModulacionPSM.ts`.
 
@@ -109,9 +133,11 @@ Sus ecuaciones están en `src/formulas/formulasPSM.ts`; las señales auxiliares 
 - Muestreo: `t_n = t_0 + n/f_s`, `n = 0 … N−1`, con `N = round((t_f − t_0)·f_s)`. La frecuencia de muestreo es el parámetro principal.
 - Validación: se rechaza `f_s ≤ 2·f_max` (Nyquist) y se avisa si `f_s < 10·f_max`. Máximo 400 000 muestras por señal.
 - ASK/PSK: el bit (o símbolo) i ocupa `[i·T, (i+1)·T)`. Una muestra que cae justo en el límite pertenece al símbolo siguiente.
-- ASK: la portadora de referencia usa la mayor de A₁ y A₀ (en OOK, A₁).
-- PSK: `φ_i = 2πi/M + φ₀`. Los bits se agrupan de k = log₂M (el primero es el más significativo) y, si faltan, se completan con ceros. Con mapeo Gray, el índice i recibe el código Gray de i. La portadora de referencia se dibuja con fase 0.
-- Constelación: `s(t) = I·cos(2πf_c t) − Q·sen(2πf_c t)`, con `I = A_c cos φ_i` y `Q = A_c sen φ_i`.
+- ASK: la portadora de referencia usa la mayor de A₁ y A₀ (en el caso del Tema 6, A₁ = Vp).
+- PSK: `φ_i = i·θ + φ₀`, con `θ = 2π/N`. Los bits se agrupan de k = log₂N (el primero es el más significativo) y, si faltan, se completan con ceros. La portadora de referencia se dibuja con fase 0.
+- Mapeo de PSK (apuntes, el predeterminado): 2PSK `1→0°`, `0→180°`; 4PSK `10→0°`, `01→90°`, `11→180°`, `00→270°` (p. 57). La figura del Tema 6 repite `10` en 270°: es una errata, y por descarte corresponde `00`. El Tema 6 no define N = 8 ni N = 16, que usan binario natural. También se puede elegir Gray o binario.
+- Constelación: `v(t) = I·cos(2πfp t) − Q·sen(2πfp t)`, con `I = Vp cos φ_i` y `Q = Vp sen φ_i`. Los puntos de 2PSK se dibujan sobre el eje I (0° y 180°), mientras que el esquema de la p. 55 los ubica sobre el eje vertical.
+- Ancho de banda estimado: AM `2fm` y PSK `1/T` (Tema 6); ASK `2/Tbit` y PM de banda ancha por Carson (complementos). En PSK, las marcas del espectro en `fp ± 1/T` son los primeros nulos.
 - Espectro de un lado: `A_k = 2|X[k]| / (N·G_c)` (1 en k = 0 y N/2), donde `G_c` es la ganancia coherente de la ventana. Un coseno de amplitud A que cae en un punto de la FFT mide A.
 
 ## Estructura del proyecto

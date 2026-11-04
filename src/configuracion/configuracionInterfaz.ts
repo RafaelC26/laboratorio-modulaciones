@@ -6,5 +6,5 @@ export const configuracionInterfaz = {
   /** Simulaciones de la misma técnica dentro de esta ventana reemplazan la última del historial [ms]. */
   ventanaAgrupacionHistorial: 4000,
   claveAlmacenamiento: "laboratorio-modulaciones",
-  versionAlmacenamiento: 1,
+  versionAlmacenamiento: 2,
 } as const;

@@ -9,12 +9,13 @@ import { GrupoCampos } from "@/componentes/controles/GrupoCampos";
 import { Insignia } from "@/componentes/interfaz/Tarjeta";
 import { limitesParametros } from "@/configuracion/configuracionGeneral";
 import { coloresSenales } from "@/configuracion/configuracionGraficas";
-import { esBandaEstrecha, indiceModulacionFase } from "@/formulas/formulasPSM";
+import { esBandaAngosta, indiceModulacionFase } from "@/formulas/formulasPSM";
 import { useParametros } from "@/hooks/useParametros";
 
 export function FormularioPSM() {
   const { entrada, actualizar, errorDe, avisoDe } = useParametros("PSM");
   const beta = indiceModulacionFase(entrada);
+  const angosta = esBandaAngosta(beta);
 
   const cambiarBeta = (nuevoBeta: number) => {
     if (entrada.amplitudModuladora > 0) actualizar({ sensibilidadFase: nuevoBeta / entrada.amplitudModuladora });
@@ -24,40 +25,40 @@ export function FormularioPSM() {
   return (
     <div className="space-y-3">
       <p className="rounded-md border border-violeta/30 bg-violeta/10 px-2.5 py-2 text-[11px] leading-relaxed text-violet-200">
-        PSM es la <strong>modulación de fase analógica</strong> (Phase Shift Modulation): la fase instantánea de la portadora sigue a m(t),
-        con una desviación máxima β = k<sub>p</sub>·A<sub>m</sub>.
+        PSM es la <strong>modulación de fase analógica</strong>, que el Tema 6 llama PM (p. 46): la fase de la portadora varía de forma proporcional a
+        la amplitud de la moduladora, con índice β = ΔΦ·V<sub>m</sub>.
       </p>
 
-      <GrupoCampos titulo="Portadora c(t)" color={coloresSenales.portadora}>
+      <GrupoCampos titulo="Portadora" color={coloresSenales.portadora}>
         <ControlAmplitud
           campo="amplitudPortadora"
-          etiqueta="Amplitud de la portadora"
-          simbolo="A_c"
+          etiqueta="Valor pico de la portadora"
+          simbolo="V_p"
           valor={entrada.amplitudPortadora}
           alCambiar={(v) => actualizar({ amplitudPortadora: v })}
           error={errorDe("amplitudPortadora")}
         />
         <ControlFrecuencia
           etiqueta="Frecuencia de la portadora"
-          simbolo="f_c"
+          simbolo="f_p"
           valor={entrada.frecuenciaPortadora}
           alCambiar={(v) => actualizar({ frecuenciaPortadora: v })}
           error={errorDe("frecuenciaPortadora")}
         />
         <ControlFase
-          etiqueta="Fase inicial"
-          simbolo={String.raw`\phi_c`}
+          etiqueta="Fase inicial (adicional)"
+          simbolo={String.raw`\phi_p`}
           valor={entrada.faseInicial}
           alCambiar={(v) => actualizar({ faseInicial: v })}
           error={errorDe("faseInicial")}
         />
       </GrupoCampos>
 
-      <GrupoCampos titulo="Moduladora m(t)" color={coloresSenales.moduladora}>
+      <GrupoCampos titulo="Moduladora" color={coloresSenales.moduladora}>
         <ControlAmplitud
           campo="amplitudModuladora"
-          etiqueta="Amplitud de la moduladora"
-          simbolo="A_m"
+          etiqueta="Valor pico de la moduladora"
+          simbolo="V_m"
           valor={entrada.amplitudModuladora}
           alCambiar={(v) => actualizar({ amplitudModuladora: v })}
           error={errorDe("amplitudModuladora")}
@@ -71,8 +72,8 @@ export function FormularioPSM() {
           aviso={avisoDe("frecuenciaModuladora")}
         />
         <CampoNumerico
-          etiqueta="Sensibilidad de fase"
-          simbolo="k_p"
+          etiqueta="Constante de desviación de fase"
+          simbolo={String.raw`\Delta\Phi`}
           unidad="rad/V"
           valor={entrada.sensibilidadFase}
           alCambiar={(v) => actualizar({ sensibilidadFase: v })}
@@ -81,19 +82,17 @@ export function FormularioPSM() {
           error={errorDe("sensibilidadFase")}
         />
         <CampoNumerico
-          etiqueta="Índice de modulación de fase"
-          simbolo={String.raw`\beta=k_pA_m`}
+          etiqueta="Índice de modulación"
+          simbolo={String.raw`\beta=\Delta\Phi\,V_m`}
           unidad="rad"
           valor={beta}
           alCambiar={cambiarBeta}
           deslizador={limitesParametros.indiceModulacionFase.deslizador}
           pasoDeslizador={0.01}
-          ayuda="Al cambiar β se ajusta k_p = β/A_m."
+          ayuda="Al cambiar β se ajusta ΔΦ = β/V_m."
           accesorio={
             <div className="mt-1.5">
-              <Insignia tono={esBandaEstrecha(beta) ? "acento" : "neutro"}>
-                {esBandaEstrecha(beta) ? "Banda estrecha (β < 0.3)" : "Banda ancha"}
-              </Insignia>
+              <Insignia tono={angosta ? "acento" : "neutro"}>{angosta ? "Banda angosta (β < π/2)" : "Banda ancha (β > π/2)"}</Insignia>
             </div>
           }
         />

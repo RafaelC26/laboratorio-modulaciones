@@ -14,21 +14,29 @@ export interface PropiedadesGraficaTiempo {
   alCambiarRango: (rango: RangoTiempo) => void;
 }
 
-const SUBTITULOS: Record<string, string> = {
-  AM: String.raw`m(t)=A_m\cos(2\pi f_m t)`,
-  PSM: String.raw`m(t)=A_m\cos(2\pi f_m t)\ \text{y}\ f_i(t)`,
-  ASK: String.raw`b(t)\in\{0,1\}`,
-  PSK: String.raw`b(t)\ \text{y fase}\ \phi_i`,
-};
+function subtitulo(resultado: ResultadoSimulacion): string {
+  switch (resultado.tipo) {
+    case "AM":
+      return String.raw`v_m(t)=V_m\operatorname{sen}(2\pi f_m t)`;
+    case "PSM":
+      return String.raw`v_m(t)=V_m\operatorname{sen}(2\pi f_m t)\ \text{y}\ f_i(t)`;
+    case "ASK":
+      return String.raw`v_m(t)\in\{1,0\}`;
+    case "PSK":
+      return resultado.parametros.ordenModulacion === 2
+        ? String.raw`v_m(t)\in\{1,-1\}\ \text{y fase}\ \phi_i`
+        : String.raw`\text{señal multinivel y fase}\ \phi_i`;
+  }
+}
 
 export function GraficaSenalModuladora({ resultado, rango, alCambiarRango }: PropiedadesGraficaTiempo) {
   const figura = useMemo(() => servicioGraficas.figuraModuladora(resultado, rango), [resultado, rango]);
   const digital = resultado.parametros.esDigital;
   return (
     <Tarjeta
-      titulo={digital ? "Señal de información (secuencia digital)" : "Señal moduladora"}
+      titulo={digital ? "Señal moduladora (datos)" : "Señal moduladora"}
       color={coloresSenales.moduladora}
-      subtitulo={<EcuacionModulacion latex={SUBTITULOS[resultado.tipo]} enLinea className="ecuacion-pequena" />}
+      subtitulo={<EcuacionModulacion latex={subtitulo(resultado)} enLinea className="ecuacion-pequena" />}
     >
       <GraficaPlotly datos={figura.datos} diseno={figura.diseno} identificador="moduladora" alCambiarRangoX={alCambiarRango} />
     </Tarjeta>

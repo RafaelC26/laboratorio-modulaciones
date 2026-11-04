@@ -36,7 +36,7 @@ export function PanelGraficas() {
 
   const digital = resultado.parametros.esDigital;
   const opciones: { id: IdGrafica; nombre: string; color: string; disponible: boolean }[] = [
-    { id: "moduladora", nombre: digital ? "Información" : "Moduladora", color: coloresSenales.moduladora, disponible: true },
+    { id: "moduladora", nombre: "Moduladora", color: coloresSenales.moduladora, disponible: true },
     { id: "portadora", nombre: "Portadora", color: coloresSenales.portadora, disponible: true },
     { id: "modulada", nombre: "Modulada", color: coloresSenales.modulada, disponible: true },
     { id: "espectro", nombre: "Espectro", color: coloresSenales.teorico, disponible: true },

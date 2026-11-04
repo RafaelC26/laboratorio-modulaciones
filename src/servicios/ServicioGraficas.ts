@@ -156,6 +156,19 @@ export class ServicioGraficas {
     }));
   }
 
+  /** Eje vertical de la moduladora digital: 0/1 en ASK, ±1 en 2PSK y niveles en MPSK. */
+  private ejeModuladoraDigital(resultado: ResultadoSimulacion): { titulo: string; eje: Partial<LayoutAxis> } {
+    const orden = resultado.parametros.ordenModulacion;
+    if (resultado.tipo === "ASK") return { titulo: "v<sub>m</sub>(t)", eje: { range: [-0.25, 1.55], tickvals: [0, 1] } };
+    if (orden === 2) return { titulo: "v<sub>m</sub>(t)", eje: { range: [-1.5, 2.1], tickvals: [-1, 1] } };
+    const niveles = Array.from({ length: orden }, (_, nivel) => nivel);
+    const maximo = orden - 1;
+    return {
+      titulo: "Nivel v<sub>m</sub>(t)",
+      eje: { range: [-0.15 * maximo, 1.4 * maximo], tickvals: orden <= 8 ? niveles : niveles.filter((nivel) => nivel % 3 === 0) },
+    };
+  }
+
   /** Etiqueta de bits encima de cada símbolo. */
   private anotacionesSimbolos(resultado: ResultadoSimulacion): Partial<Annotations>[] {
     const intervalos = resultado.intervalosSimbolo;
@@ -180,19 +193,20 @@ export class ServicioGraficas {
     const auxiliares = resultado.auxiliares.filter((a) => a.grafica === "moduladora");
     const secundario = auxiliares.find((a) => a.ejeSecundario);
     const { etiqueta } = this.escalaTiempo(resultado);
+    const ejeDigital = digital ? this.ejeModuladoraDigital(resultado) : null;
 
     const datos: Data[] = [
-      this.trazaSenal(resultado, resultado.senalModuladora, coloresSenales.moduladora, digital ? "b(t)" : "m(t)"),
+      this.trazaSenal(resultado, resultado.senalModuladora, coloresSenales.moduladora, "vm(t)"),
       ...auxiliares.map((a) => this.trazaAuxiliar(resultado, a)),
     ];
     const diseno = this.disenoBase({
       tituloX: `Tiempo [${etiqueta}]`,
-      tituloY: digital ? "b(t)" : "m(t) [V]",
+      tituloY: ejeDigital ? ejeDigital.titulo : "v<sub>m</sub>(t) [V]",
       altura: temaGraficas.alturaTiempo,
       tituloY2: secundario?.tituloEje,
     });
-    if (digital) {
-      diseno.yaxis = { ...diseno.yaxis, range: [-0.25, 1.55], tickvals: [0, 1], autorange: false };
+    if (ejeDigital) {
+      diseno.yaxis = { ...diseno.yaxis, ...ejeDigital.eje, autorange: false };
       diseno.shapes = this.formasLimitesSimbolo(resultado);
       diseno.annotations = this.anotacionesSimbolos(resultado);
     }
@@ -212,20 +226,20 @@ export class ServicioGraficas {
 
   figuraPortadora(resultado: ResultadoSimulacion, rango: RangoTiempo): FiguraPlotly {
     const { etiqueta } = this.escalaTiempo(resultado);
-    const diseno = this.disenoBase({ tituloX: `Tiempo [${etiqueta}]`, tituloY: "c(t) [V]", altura: temaGraficas.alturaTiempo });
+    const diseno = this.disenoBase({ tituloX: `Tiempo [${etiqueta}]`, tituloY: "v<sub>p</sub>(t) [V]", altura: temaGraficas.alturaTiempo });
     diseno.shapes = this.formasLimitesSimbolo(resultado);
     this.aplicarRango(diseno, resultado, rango);
-    return { datos: [this.trazaSenal(resultado, resultado.senalPortadora, coloresSenales.portadora, "c(t)")], diseno };
+    return { datos: [this.trazaSenal(resultado, resultado.senalPortadora, coloresSenales.portadora, "vp(t)")], diseno };
   }
 
   figuraModulada(resultado: ResultadoSimulacion, rango: RangoTiempo): FiguraPlotly {
     const { etiqueta, factor } = this.escalaTiempo(resultado);
     const auxiliares = resultado.auxiliares.filter((a) => a.grafica === "modulada");
     const datos: Data[] = [
-      this.trazaSenal(resultado, resultado.senalModulada, coloresSenales.modulada, "s(t)"),
+      this.trazaSenal(resultado, resultado.senalModulada, coloresSenales.modulada, "v(t)"),
       ...auxiliares.map((a) => this.trazaAuxiliar(resultado, a)),
     ];
-    const diseno = this.disenoBase({ tituloX: `Tiempo [${etiqueta}]`, tituloY: "s(t) [V]", altura: temaGraficas.alturaTiempo + 30 });
+    const diseno = this.disenoBase({ tituloX: `Tiempo [${etiqueta}]`, tituloY: "v(t) [V]", altura: temaGraficas.alturaTiempo + 30 });
 
     const regiones: Partial<Shape>[] = resultado.regionesSobremodulacion.map(([inicio, fin]) => ({
       type: "rect",
@@ -249,7 +263,7 @@ export class ServicioGraficas {
           yref: "paper",
           xanchor: "right",
           yanchor: "bottom",
-          text: "Zonas rojas: sobremodulación (1 + μ·m(t) < 0)",
+          text: "Zonas rojas: sobremodulación (1 + m·sen(2πf<sub>m</sub>t) < 0)",
           showarrow: false,
           font: { size: 10, color: coloresSenales.error },
         },
@@ -318,7 +332,7 @@ export class ServicioGraficas {
         mode: "lines",
         x: espectro.frecuencias.map((f) => f * escalaF.factor),
         y,
-        name: `|S(f)| medido (FFT, ventana ${nombreVentana})`,
+        name: `|V(f)| medido (FFT, ventana ${nombreVentana})`,
         line: { color: colores[opciones.senal], width: 1.6 },
         fill: enDecibelios ? "none" : "tozeroy",
         fillcolor: "rgba(34, 211, 238, 0.08)",

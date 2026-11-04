@@ -9,8 +9,9 @@ import { GrupoCampos } from "@/componentes/controles/GrupoCampos";
 import { Insignia } from "@/componentes/interfaz/Tarjeta";
 import { limitesParametros } from "@/configuracion/configuracionGeneral";
 import { coloresSenales } from "@/configuracion/configuracionGraficas";
-import { clasificarIndiceAM, indiceModulacionAM, textoClasificacionAM } from "@/formulas/formulasAM";
+import { clasificarIndiceAM, indiceModulacionAM, porcentajeModulacionAM, textoClasificacionAM } from "@/formulas/formulasAM";
 import { useParametros } from "@/hooks/useParametros";
+import { formatearNumero } from "@/utilidades/formatoNumerico";
 
 const TONO_CLASIFICACION = {
   "sin-modulacion": "neutro",
@@ -21,41 +22,41 @@ const TONO_CLASIFICACION = {
 
 export function FormularioAM() {
   const { entrada, actualizar, errorDe, avisoDe } = useParametros("AM");
-  const mu = indiceModulacionAM(entrada);
-  const clasificacion = clasificarIndiceAM(mu);
+  const m = indiceModulacionAM(entrada);
+  const clasificacion = clasificarIndiceAM(m);
 
   return (
     <div className="space-y-3">
-      <GrupoCampos titulo="Portadora c(t)" color={coloresSenales.portadora}>
+      <GrupoCampos titulo="Portadora" color={coloresSenales.portadora}>
         <ControlAmplitud
           campo="amplitudPortadora"
-          etiqueta="Amplitud de la portadora"
-          simbolo="A_c"
+          etiqueta="Valor pico de la portadora"
+          simbolo="V_p"
           valor={entrada.amplitudPortadora}
           alCambiar={(v) => actualizar({ amplitudPortadora: v })}
           error={errorDe("amplitudPortadora")}
         />
         <ControlFrecuencia
           etiqueta="Frecuencia de la portadora"
-          simbolo="f_c"
+          simbolo="f_p"
           valor={entrada.frecuenciaPortadora}
           alCambiar={(v) => actualizar({ frecuenciaPortadora: v })}
           error={errorDe("frecuenciaPortadora")}
         />
         <ControlFase
-          etiqueta="Fase inicial"
-          simbolo={String.raw`\phi_c`}
+          etiqueta="Fase inicial (adicional)"
+          simbolo={String.raw`\phi_p`}
           valor={entrada.faseInicial}
           alCambiar={(v) => actualizar({ faseInicial: v })}
           error={errorDe("faseInicial")}
         />
       </GrupoCampos>
 
-      <GrupoCampos titulo="Moduladora m(t)" color={coloresSenales.moduladora}>
+      <GrupoCampos titulo="Moduladora" color={coloresSenales.moduladora}>
         <ControlAmplitud
           campo="amplitudModuladora"
-          etiqueta="Amplitud de la moduladora"
-          simbolo="A_m"
+          etiqueta="Valor pico de la moduladora"
+          simbolo="V_m"
           valor={entrada.amplitudModuladora}
           alCambiar={(v) => actualizar({ amplitudModuladora: v })}
           error={errorDe("amplitudModuladora")}
@@ -70,15 +71,16 @@ export function FormularioAM() {
         />
         <CampoNumerico
           etiqueta="Índice de modulación"
-          simbolo={String.raw`\mu=A_m/A_c`}
-          valor={mu}
+          simbolo={String.raw`m=V_m/V_p`}
+          valor={m}
           alCambiar={(v) => actualizar({ amplitudModuladora: v * entrada.amplitudPortadora })}
           deslizador={limitesParametros.indiceModulacion.deslizador}
           pasoDeslizador={0.01}
           aviso={avisoDe("amplitudModuladora")}
-          ayuda="Al cambiar μ se ajusta A_m = μ·A_c."
+          ayuda="Al cambiar m se ajusta V_m = m·V_p."
           accesorio={
-            <div className="mt-1.5">
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <Insignia tono="neutro">M = {formatearNumero(porcentajeModulacionAM(entrada), 4)} %</Insignia>
               <Insignia tono={TONO_CLASIFICACION[clasificacion]}>{textoClasificacionAM[clasificacion]}</Insignia>
             </div>
           }

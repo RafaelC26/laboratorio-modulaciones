@@ -53,9 +53,9 @@ export function GraficaEspectral({ resultado, espectro, analisis, visualizacion,
           etiqueta="Señal analizada"
           valor={visualizacion.senalEspectro}
           opciones={[
-            { valor: "modulada", etiqueta: "Modulada s(t)" },
-            { valor: "moduladora", etiqueta: resultado.parametros.esDigital ? "Secuencia b(t)" : "Moduladora m(t)" },
-            { valor: "portadora", etiqueta: "Portadora c(t)" },
+            { valor: "modulada", etiqueta: "Modulada v(t)" },
+            { valor: "moduladora", etiqueta: "Moduladora vm(t)" },
+            { valor: "portadora", etiqueta: "Portadora vp(t)" },
           ]}
           alCambiar={(senal) => actualizar({ senalEspectro: senal })}
         />

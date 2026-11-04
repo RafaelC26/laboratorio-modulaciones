@@ -33,6 +33,8 @@ export interface Metrica {
   unidad?: string;
   estado?: "normal" | "advertencia" | "critico";
   descripcion?: string;
+  /** true si la magnitud no está en el Tema 6 (apuntes del curso). */
+  complemento?: boolean;
 }
 
 /** Datos homogéneos para comparar técnicas (sección 16.3 del documento). */
@@ -61,7 +63,7 @@ export interface DatosModulacion {
   constelacion: PuntoConstelacion[];
   componentesTeoricos: ComponenteEspectralTeorica[];
   marcasFrecuencia: MarcaFrecuencia[];
-  /** Intervalos [inicio, fin] en segundos donde 1 + μ·m(t) < 0 (solo AM). */
+  /** Intervalos [inicio, fin] en segundos donde 1 + m·sen(2π f_m t) < 0 (solo AM). */
   regionesSobremodulacion: Array<[number, number]>;
   advertencias: string[];
 }

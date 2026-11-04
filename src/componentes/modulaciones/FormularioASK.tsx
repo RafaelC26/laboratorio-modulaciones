@@ -19,7 +19,7 @@ export function FormularioASK() {
 
   return (
     <div className="space-y-3">
-      <GrupoCampos titulo="Información digital" color={coloresSenales.moduladora}>
+      <GrupoCampos titulo="Moduladora (datos)" color={coloresSenales.moduladora}>
         <CampoBits
           valor={entrada.secuenciaBits}
           alCambiar={(texto) => actualizar({ secuenciaBits: texto })}
@@ -28,17 +28,17 @@ export function FormularioASK() {
         />
         <CampoNumerico
           etiqueta="Duración de bit"
-          simbolo="T_b"
+          simbolo="T_{bit}"
           unidades={UNIDADES_TIEMPO}
           valor={entrada.duracionBit}
           alCambiar={(v) => actualizar({ duracionBit: v })}
           error={errorDe("duracionBit")}
           aviso={avisoDe("duracionBit")}
-          ayuda={Number.isFinite(1 / entrada.duracionBit) ? `Tasa de bits R_b = 1/T_b = ${Number((1 / entrada.duracionBit).toPrecision(6))} bit/s` : undefined}
+          ayuda={Number.isFinite(1 / entrada.duracionBit) ? `Velocidad de transmisión V_t = 1/T_bit = ${Number((1 / entrada.duracionBit).toPrecision(6))} bit/s` : undefined}
         />
       </GrupoCampos>
 
-      <GrupoCampos titulo="Amplitudes por símbolo" color={coloresSenales.modulada}>
+      <GrupoCampos titulo="Amplitudes por bit" color={coloresSenales.modulada}>
         <ControlAmplitud
           campo="amplitudBit1"
           etiqueta="Amplitud para el bit 1"
@@ -57,14 +57,14 @@ export function FormularioASK() {
           accesorio={
             <div className="mt-1.5 flex items-center gap-2">
               {esOOK(entrada) ? (
-                <Insignia tono="acento">OOK: encendido / apagado</Insignia>
+                <Insignia tono="acento">Caso del Tema 6: portadora presente o ausente</Insignia>
               ) : (
                 <button
                   type="button"
                   onClick={() => actualizar({ amplitudBit0: 0 })}
                   className="rounded border border-grafito-600 px-1.5 py-0.5 text-[11px] text-slate-400 hover:border-grafito-500 hover:text-slate-200"
                 >
-                  Convertir en OOK (A₀ = 0)
+                  Usar el caso del Tema 6 (A₀ = 0)
                 </button>
               )}
             </div>
@@ -72,17 +72,17 @@ export function FormularioASK() {
         />
       </GrupoCampos>
 
-      <GrupoCampos titulo="Portadora c(t)" color={coloresSenales.portadora}>
+      <GrupoCampos titulo="Portadora" color={coloresSenales.portadora}>
         <ControlFrecuencia
           etiqueta="Frecuencia de la portadora"
-          simbolo="f_c"
+          simbolo="f_p"
           valor={entrada.frecuenciaPortadora}
           alCambiar={(v) => actualizar({ frecuenciaPortadora: v })}
           error={errorDe("frecuenciaPortadora")}
         />
         <ControlFase
-          etiqueta="Fase inicial"
-          simbolo={String.raw`\phi_c`}
+          etiqueta="Fase inicial (adicional)"
+          simbolo={String.raw`\phi_p`}
           valor={entrada.faseInicial}
           alCambiar={(v) => actualizar({ faseInicial: v })}
           error={errorDe("faseInicial")}

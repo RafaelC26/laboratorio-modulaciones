@@ -13,7 +13,7 @@ export function GraficaSenalModulada({ resultado, rango, alCambiarRango }: Propi
   const sobremodulada = resultado.regionesSobremodulacion.length > 0;
   return (
     <Tarjeta
-      titulo="Señal modulada s(t)"
+      titulo="Señal modulada v(t)"
       color={coloresSenales.modulada}
       subtitulo={resultado.nombreVariante}
       acciones={sobremodulada ? <Insignia tono="error">Sobremodulación</Insignia> : undefined}

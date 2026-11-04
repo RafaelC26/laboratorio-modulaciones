@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ParametrosModulacion } from "@/clases/ParametrosModulacion";
 import { valoresPredeterminados } from "@/configuracion/configuracionGeneral";
-import { senalPortadora } from "@/formulas/formulasPortadora";
+import { portadoraCoseno, portadoraSeno } from "@/formulas/formulasPortadora";
 import { besselJ } from "@/formulas/formulasPSM";
 import { motorMatematico } from "@/motores/MotorMatematico";
 import { MotorTransformadaFourier } from "@/motores/MotorTransformadaFourier";
@@ -23,14 +23,20 @@ function amplitudEn(frecuencias: Float64Array, amplitudes: Float64Array, f: numb
 }
 
 describe("Prueba de precisión de la portadora (sección 23.4)", () => {
-  it("c(0) = A_c", () => {
-    expect(senalPortadora(0, { amplitudPortadora: 3.7, frecuenciaPortadora: 1234, faseInicial: 0 })).toBe(3.7);
+  it("con coseno (PM y PSK): v_p(0) = V_p", () => {
+    expect(portadoraCoseno(0, { amplitudPortadora: 3.7, frecuenciaPortadora: 1234, faseInicial: 0 })).toBe(3.7);
   });
 
-  it("c(T/4) = 0 y c(T/2) = −A_c", () => {
+  it("con coseno: v_p(T/4) = 0 y v_p(T/2) = −V_p", () => {
     const v = { amplitudPortadora: 2, frecuenciaPortadora: 500, faseInicial: 0 };
-    expect(senalPortadora(1 / 2000, v)).toBeCloseTo(0, 12);
-    expect(senalPortadora(1 / 1000, v)).toBeCloseTo(-2, 12);
+    expect(portadoraCoseno(1 / 2000, v)).toBeCloseTo(0, 12);
+    expect(portadoraCoseno(1 / 1000, v)).toBeCloseTo(-2, 12);
+  });
+
+  it("con seno (AM y ASK): v_p(0) = 0 y v_p(T/4) = V_p", () => {
+    const v = { amplitudPortadora: 2, frecuenciaPortadora: 500, faseInicial: 0 };
+    expect(portadoraSeno(0, v)).toBe(0);
+    expect(portadoraSeno(1 / 2000, v)).toBeCloseTo(2, 12);
   });
 });
 
@@ -68,7 +74,7 @@ describe("Motor matemático", () => {
     expect(errores.some((e) => e.mensaje.includes("muestras"))).toBe(true);
   });
 
-  it("marca las zonas de sobremodulación cuando μ > 1", () => {
+  it("marca las zonas de sobremodulación cuando m > 1", () => {
     const operacion = servicio.simular({ ...valoresPredeterminados.AM, amplitudModuladora: 1.5 });
     expect(operacion.exito).toBe(true);
     if (!operacion.exito) return;
@@ -123,8 +129,8 @@ describe("Transformada de Fourier", () => {
     expect(energiaFrecuencia / x.length).toBeCloseTo(energiaTiempo, 9);
   });
 
-  it("el espectro AM muestra la portadora A_c y bandas laterales μA_c/2 en f_c ± f_m", () => {
-    const operacion = servicio.simular(valoresPredeterminados.AM); // A_c = 1, μ = 0.5, f_c = 1 kHz, f_m = 100 Hz
+  it("el espectro AM muestra la portadora V_p y las frecuencias laterales mV_p/2 en f_p ± f_m", () => {
+    const operacion = servicio.simular(valoresPredeterminados.AM); // V_p = 1, m = 0.5, f_p = 1 kHz, f_m = 100 Hz
     expect(operacion.exito).toBe(true);
     if (!operacion.exito) return;
     const r = operacion.resultado;
@@ -137,7 +143,7 @@ describe("Transformada de Fourier", () => {
     }
   });
 
-  it("el espectro PSM coincide con las amplitudes de Bessel A_c|J_n(β)|", () => {
+  it("el espectro PSM coincide con las amplitudes de Bessel V_p|J_n(β)|", () => {
     const operacion = servicio.simular(valoresPredeterminados.PSM); // β = 2
     expect(operacion.exito).toBe(true);
     if (!operacion.exito) return;
@@ -158,7 +164,7 @@ describe("Exportación", () => {
     const lineas = servicioExportacion.generarCSV(operacion.resultado).split("\n");
     expect(lineas).toHaveLength(operacion.resultado.cantidadMuestras + 1);
     expect(lineas[0]).toContain("t [s]");
-    expect(lineas[1].split(",")).toHaveLength(5); // t, b(t), c(t), s(t), fase
+    expect(lineas[1].split(",")).toHaveLength(5); // t, vm(t), vp(t), v(t), fase
     const reporte = servicioExportacion.generarReporte(operacion.resultado);
     expect(reporte).toContain(operacion.resultado.ecuacion);
     expect(JSON.parse(servicioExportacion.generarJSON(operacion.resultado)).tecnica).toBe("PSK");

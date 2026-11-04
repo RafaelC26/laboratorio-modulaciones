@@ -31,19 +31,19 @@ export class ServicioComparacion {
 
   /** Descripción corta de una configuración (historial y leyendas). */
   etiquetaEntrada(entrada: EntradaModulacion): string {
-    const fc = formatearConUnidad(entrada.frecuenciaPortadora, "Hz", 3);
+    const fp = formatearConUnidad(entrada.frecuenciaPortadora, "Hz", 3);
     switch (entrada.tipo) {
       case "AM":
-        return `AM · μ=${formatearNumero(indiceModulacionAM(entrada), 3)} · fc=${fc} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
+        return `AM · m=${formatearNumero(indiceModulacionAM(entrada), 3)} · fp=${fp} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
       case "ASK": {
         const bits = limpiarSecuenciaBits(entrada.secuenciaBits);
         const resumenBits = bits.length > 12 ? `${bits.slice(0, 12)}…` : bits;
-        return `${entrada.amplitudBit0 === 0 ? "OOK" : "ASK"} · ${resumenBits} · Tb=${formatearConUnidad(entrada.duracionBit, "s", 3)} · fc=${fc}`;
+        return `${entrada.amplitudBit0 === 0 ? "OOK" : "ASK"} · ${resumenBits} · Tbit=${formatearConUnidad(entrada.duracionBit, "s", 3)} · fp=${fp}`;
       }
       case "PSK":
-        return `${nombreVariantePSK(entrada.ordenModulacion)} · ${limpiarSecuenciaBits(entrada.secuenciaBits).length} bits · Ts=${formatearConUnidad(entrada.duracionSimbolo, "s", 3)} · fc=${fc}`;
+        return `${nombreVariantePSK(entrada.ordenModulacion)} · ${limpiarSecuenciaBits(entrada.secuenciaBits).length} bits · T=${formatearConUnidad(entrada.duracionSimbolo, "s", 3)} · fp=${fp}`;
       case "PSM":
-        return `PSM · β=${formatearNumero(indiceModulacionFase(entrada), 3)} rad · fc=${fc} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
+        return `PSM · β=${formatearNumero(indiceModulacionFase(entrada), 3)} rad · fp=${fp} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
     }
   }
 
@@ -57,10 +57,10 @@ export class ServicioComparacion {
       ["amplitudMaxima", "Amplitud máxima (envolvente)", (r) => formatearConUnidad(r.resumen.amplitudMaxima, "V")],
       ["amplitudMinima", "Amplitud mínima (envolvente)", (r) => formatearConUnidad(r.resumen.amplitudMinima, "V")],
       ["frecuenciaCentral", "Frecuencia central", (r) => formatearConUnidad(r.resumen.frecuenciaCentral, "Hz")],
-      ["anchoBanda", "Ancho de banda estimado (teórico)", (r) => formatearConUnidad(r.resumen.anchoBandaEstimado, "Hz")],
+      ["anchoBanda", "Ancho de banda estimado", (r) => formatearConUnidad(r.resumen.anchoBandaEstimado, "Hz")],
       ["anchoBandaMedido", "Ancho de banda medido (99 % potencia)", (_r, i) => formatearConUnidad(analisis[i].anchoBandaOcupado, "Hz")],
-      ["tasaBits", "Tasa de bits", (r) => opcional(r.resumen.tasaBits, "bit/s")],
-      ["tasaSimbolos", "Tasa de símbolos", (r) => opcional(r.resumen.tasaSimbolos, "Bd")],
+      ["tasaBits", "Velocidad de transmisión", (r) => opcional(r.resumen.tasaBits, "bit/s")],
+      ["tasaSimbolos", "Velocidad de modulación", (r) => opcional(r.resumen.tasaSimbolos, "Bd")],
       ["estados", "Estados de modulación", (r) => (r.resumen.estados === null ? "—" : String(r.resumen.estados))],
       ["potencia", "Potencia media medida", (r) => formatearConUnidad(r.senalModulada.potenciaMedia, "W")],
       ["muestreo", "Frecuencia de muestreo", (r) => formatearConUnidad(r.frecuenciaMuestreo, "Hz")],
@@ -83,7 +83,7 @@ export class ServicioComparacion {
     }));
     const diseno = servicioGraficas.disenoBase({
       tituloX: `Tiempo [${escala.etiqueta}]`,
-      tituloY: "s(t) [V]",
+      tituloY: "v(t) [V]",
       altura: temaGraficas.alturaComparacion,
     });
     diseno.legend = { ...diseno.legend, y: -0.32, yanchor: "top" };

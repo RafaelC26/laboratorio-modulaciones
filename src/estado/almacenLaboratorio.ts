@@ -189,6 +189,12 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
       storage: createJSONStorage(() => localStorage),
       // La hidratación se hace en el cliente tras el primer render (evita diferencias con el HTML del servidor).
       skipHydration: true,
+      // v1 → v2: el mapeo predeterminado de PSK pasa a ser el del Tema 6.
+      migrate: (persistido) => {
+        const estado = persistido as EstadoPersistido;
+        if (estado?.entradas?.PSK) estado.entradas.PSK.mapeoSimbolos = "apuntes";
+        return estado;
+      },
       partialize: (estado): EstadoPersistido => ({
         tipoSeleccionado: estado.tipoSeleccionado,
         entradas: estado.entradas,

@@ -8,8 +8,11 @@ export type TipoModulacion = "AM" | "ASK" | "PSK" | "PSM";
 
 export type CategoriaModulacion = "analogica" | "digital";
 
-/** Asignación entre grupos de bits e índices de fase en PSK. */
-export type MapeoSimbolos = "binario" | "gray";
+/**
+ * Asignación entre grupos de bits e índices de fase en PSK.
+ * "apuntes" es la del Tema 6 (p. 54–57); los órdenes que no define usan binario natural.
+ */
+export type MapeoSimbolos = "apuntes" | "gray" | "binario";
 
 /** Configuración temporal común. En técnicas digitales el intervalo se deriva de la secuencia. */
 export interface ConfiguracionTemporal {
@@ -20,10 +23,10 @@ export interface ConfiguracionTemporal {
 
 export interface EntradaAM {
   tipo: "AM";
-  amplitudPortadora: number; // A_c [V]
-  frecuenciaPortadora: number; // f_c [Hz]
-  faseInicial: number; // φ_c [rad]
-  amplitudModuladora: number; // A_m [V]  (μ = A_m / A_c)
+  amplitudPortadora: number; // V_p [V]
+  frecuenciaPortadora: number; // f_p [Hz]
+  faseInicial: number; // φ_p [rad]
+  amplitudModuladora: number; // V_m [V]  (m = V_m / V_p)
   frecuenciaModuladora: number; // f_m [Hz]
   temporal: ConfiguracionTemporal;
 }
@@ -33,19 +36,19 @@ export interface EntradaASK {
   secuenciaBits: string;
   amplitudBit1: number; // A_1 [V]
   amplitudBit0: number; // A_0 [V]
-  frecuenciaPortadora: number; // f_c [Hz]
-  duracionBit: number; // T_b [s]
-  faseInicial: number; // φ_c [rad]
+  frecuenciaPortadora: number; // f_p [Hz]
+  duracionBit: number; // T_bit [s]
+  faseInicial: number; // φ_p [rad]
   temporal: ConfiguracionTemporal;
 }
 
 export interface EntradaPSK {
   tipo: "PSK";
   secuenciaBits: string;
-  ordenModulacion: number; // M (2, 4, 8, 16)
-  amplitudPortadora: number; // A_c [V]
-  frecuenciaPortadora: number; // f_c [Hz]
-  duracionSimbolo: number; // T_s [s]
+  ordenModulacion: number; // N (2, 4, 8, 16)
+  amplitudPortadora: number; // V_p [V]
+  frecuenciaPortadora: number; // f_p [Hz]
+  duracionSimbolo: number; // T [s]
   faseInicial: number; // φ_0 [rad], desplazamiento de la constelación
   mapeoSimbolos: MapeoSimbolos;
   temporal: ConfiguracionTemporal;
@@ -54,12 +57,12 @@ export interface EntradaPSK {
 /** PSM: modulación de fase analógica (Phase Shift Modulation). Ver src/formulas/formulasPSM.ts */
 export interface EntradaPSM {
   tipo: "PSM";
-  amplitudPortadora: number; // A_c [V]
-  frecuenciaPortadora: number; // f_c [Hz]
-  faseInicial: number; // φ_c [rad]
-  amplitudModuladora: number; // A_m [V]
+  amplitudPortadora: number; // V_p [V]
+  frecuenciaPortadora: number; // f_p [Hz]
+  faseInicial: number; // φ_p [rad]
+  amplitudModuladora: number; // V_m [V]
   frecuenciaModuladora: number; // f_m [Hz]
-  sensibilidadFase: number; // k_p [rad/V]  (β = k_p · A_m)
+  sensibilidadFase: number; // ΔΦ [rad/V], constante de desviación de fase (β = ΔΦ · V_m)
   temporal: ConfiguracionTemporal;
 }
 

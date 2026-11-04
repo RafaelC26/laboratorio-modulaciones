@@ -66,7 +66,7 @@ export function PanelComparacion() {
         </ul>
       </Tarjeta>
 
-      <Tarjeta titulo="Resultados comparativos" subtitulo="Ancho de banda medido con ventana Hann sobre la señal modulada" sinRelleno>
+      <Tarjeta titulo="Resultados comparativos" subtitulo="Ancho de banda estimado: AM 2fm y PSK 1/T (Tema 6); ASK 2/Tbit y PM de banda ancha por Carson (complementos). El medido usa ventana Hann." sinRelleno>
         <div className="overflow-x-auto px-4 pb-4">
           <table className="w-full min-w-[520px] text-xs">
             <thead>
