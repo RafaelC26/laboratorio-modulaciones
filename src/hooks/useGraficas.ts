@@ -5,8 +5,8 @@ import { useAlmacenLaboratorio } from "@/estado/almacenLaboratorio";
 import { servicioGraficas, type RangoTiempo } from "@/servicios/ServicioGraficas";
 
 /**
- * Estado de visualización y espectro de la señal elegida. Cambiar la ventana,
- * la escala o las gráficas visibles no vuelve a simular las señales.
+ * Estado de visualización y espectro de la señal modulada. Cambiar la escala o
+ * las gráficas visibles no vuelve a simular las señales.
  */
 export function useGraficas() {
   const resultado = useAlmacenLaboratorio((s) => s.resultado);
@@ -15,10 +15,9 @@ export function useGraficas() {
   const alternarGrafica = useAlmacenLaboratorio((s) => s.alternarGrafica);
 
   const espectro = useMemo(
-    () => (resultado ? servicioGraficas.calcularEspectro(resultado, visualizacion.senalEspectro, visualizacion.ventana) : null),
-    [resultado, visualizacion.senalEspectro, visualizacion.ventana],
+    () => (resultado ? servicioGraficas.calcularEspectro(resultado, "modulada", "rectangular") : null),
+    [resultado],
   );
-  const analisis = useMemo(() => (espectro ? servicioGraficas.analizarEspectro(espectro) : null), [espectro]);
 
   /** Recibe el rango en la unidad del eje (ms, µs…) y lo guarda en segundos. */
   const establecerRangoTiempo = useCallback(
@@ -35,5 +34,5 @@ export function useGraficas() {
     [resultado, actualizarVisualizacion],
   );
 
-  return { resultado, visualizacion, actualizarVisualizacion, alternarGrafica, establecerRangoTiempo, espectro, analisis };
+  return { resultado, visualizacion, actualizarVisualizacion, alternarGrafica, establecerRangoTiempo, espectro };
 }

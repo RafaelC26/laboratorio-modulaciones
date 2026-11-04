@@ -54,23 +54,22 @@ export function useSimulacion() {
 }
 
 /**
- * Modo dinámico (sección 18.2): recalcula automáticamente tras un breve
- * retardo desde el último cambio. Al cambiar de técnica se simula de inmediato.
+ * Recalcula automáticamente tras un breve retardo desde el último cambio de
+ * parámetros. Al cambiar de técnica se simula de inmediato.
  * Debe montarse una sola vez, en el componente raíz del laboratorio.
  */
 export function useSimulacionDinamica(): void {
   const hidratado = useAlmacenLaboratorio((s) => s.hidratado);
   const tipo = useAlmacenLaboratorio((s) => s.tipoSeleccionado);
   const entrada = useAlmacenLaboratorio((s) => s.entradas[s.tipoSeleccionado]);
-  const modoDinamico = useAlmacenLaboratorio((s) => s.modoDinamico);
 
   useEffect(() => {
     if (hidratado) ejecutarSimulacion({ soloSiCambio: true });
   }, [hidratado, tipo]);
 
   useEffect(() => {
-    if (!hidratado || !modoDinamico) return;
+    if (!hidratado) return;
     const temporizador = setTimeout(() => ejecutarSimulacion({ soloSiCambio: true }), configuracionInterfaz.retardoModoDinamico);
     return () => clearTimeout(temporizador);
-  }, [hidratado, modoDinamico, entrada]);
+  }, [hidratado, entrada]);
 }

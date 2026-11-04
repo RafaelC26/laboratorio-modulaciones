@@ -18,7 +18,7 @@ Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muest
 
 </div>
 
-![Modulación AM: moduladora, portadora, señal modulada con su envolvente y panel de ecuaciones](docs/captura-am.png)
+![Modulación AM: parámetros a la izquierda y, a la derecha, moduladora, portadora y señal modulada con su envolvente](docs/captura-am.png)
 
 ### Abrir una técnica directamente
 
@@ -68,16 +68,13 @@ Otros comandos:
 ## Qué permite hacer
 
 - Elegir la técnica y configurar sus parámetros con validación en vivo (campos con unidades Hz/kHz/MHz, s/ms/µs, °/rad).
-- Ver la señal moduladora (o la secuencia digital), la portadora y la señal modulada, con zoom sincronizado entre las tres.
+- Ver la señal moduladora (o la secuencia digital), la portadora y la señal modulada, con zoom sincronizado entre las tres. Todo se recalcula solo al cambiar un parámetro.
 - AM: envolvente, porcentaje de modulación M y zonas de **sobremodulación** marcadas en rojo cuando M > 100 %.
-- PSK: moduladora bipolar o multinivel, fase de cada símbolo, etiquetas de bits, **constelación** y tabla de mapeo (apuntes, Gray o binario).
+- PSK: moduladora bipolar o multinivel, fase de cada símbolo, etiquetas de bits, **constelación** y mapeo seleccionable (apuntes, Gray o binario).
 - PSM: índice β, banda angosta o ancha, frecuencia instantánea y espectro de Bessel.
-- Espectro por FFT exacta de N puntos (radix-2 o Bluestein), con ventanas rectangular, Hann, Hamming y Blackman, escala lineal o dB, y **marcadores teóricos** para contrastar.
-- Modo dinámico (recalcula al cambiar un parámetro) o manual (botón **Ejecutar**, atajo `Ctrl + Enter`).
-- Comparar hasta 6 simulaciones: tabla de resultados y superposición de señales y espectros con la misma escala.
-- Exportar datos (CSV), parámetros y resultados (JSON), un reporte (Markdown) y las gráficas (PNG).
+- Espectro de la señal modulada por FFT exacta de N puntos (radix-2 o Bluestein), en escala lineal o dB, con **marcadores teóricos** para contrastar.
+- Descargar cada gráfica como PNG con el icono de cámara de la propia gráfica.
 - Historial de simulaciones anteriores (guardado en el navegador).
-- Cada fórmula indica su fuente: la página del Tema 6 o «Complemento» si no está en los apuntes.
 
 ## Fórmulas del Tema 6
 
@@ -91,14 +88,14 @@ Las ecuaciones siguen los apuntes del curso (*Tema 6. Representación de informa
 | **MPSK** | `Vp·cos(2π fp t)` | señal multinivel | fases separadas `θ = 2π/N`, `Vt = (1/T)·log₂N`, `BW = 1/T` | 55–58 |
 | **PSM (PM)** | `Vp·cos(2π fp t)` | `Vm·sen(2π fm t)` | `Vp·cos[2π fp t + β·sen(2π fm t)]`, con `β = ΔΦ·Vm` | 47–48 |
 
-Lo que se añadió y no está en los apuntes aparece marcado como **Complemento** en la aplicación:
+En `src/formulas/`, cada fórmula indica su página del Tema 6 en `paginaTema6`. Las que no la tienen son complementos que no están en los apuntes:
 
 - **Parámetros:** la fase inicial `φp` y la fase de referencia `φ0`, que valen 0 por defecto, y las amplitudes `A1` y `A0` libres en ASK (con `A1 = Vp` y `A0 = 0` se obtiene la expresión del Tema 6).
 - **AM:** `Pp = Vp²/2R`, la eficiencia y la envolvente como curva.
 - **ASK:** `BW = 2/Tbit`, la energía por bit y la profundidad de modulación.
 - **PSK:** las componentes I/Q, la distancia mínima, la energía, la eficiencia espectral y el mapeo Gray.
 - **PSM:** la frecuencia instantánea, las rayas de Bessel y la regla de Carson.
-- **Análisis:** la FFT con sus ventanas y el criterio `fs ≥ 10·fmax`.
+- **Análisis:** la FFT y el criterio `fs ≥ 10·fmax`.
 
 ## Dónde se cambian las fórmulas
 
@@ -137,8 +134,8 @@ Sus ecuaciones están en `src/formulas/formulasPSM.ts`; las señales auxiliares 
 - PSK: `φ_i = i·θ + φ₀`, con `θ = 2π/N`. Los bits se agrupan de k = log₂N (el primero es el más significativo) y, si faltan, se completan con ceros. La portadora de referencia se dibuja con fase 0.
 - Mapeo de PSK (apuntes, el predeterminado): 2PSK `1→0°`, `0→180°`; 4PSK `10→0°`, `01→90°`, `11→180°`, `00→270°` (p. 57). La figura del Tema 6 repite `10` en 270°: es una errata, y por descarte corresponde `00`. El Tema 6 no define N = 8 ni N = 16, que usan binario natural. También se puede elegir Gray o binario.
 - Constelación: `v(t) = I·cos(2πfp t) − Q·sen(2πfp t)`, con `I = Vp cos φ_i` y `Q = Vp sen φ_i`. Los puntos de 2PSK se dibujan sobre el eje I (0° y 180°), mientras que el esquema de la p. 55 los ubica sobre el eje vertical.
-- Ancho de banda estimado: AM `2fm` y PSK `1/T` (Tema 6); ASK `2/Tbit` y PM de banda ancha por Carson (complementos). En PSK, las marcas del espectro en `fp ± 1/T` son los primeros nulos.
-- Espectro de un lado: `A_k = 2|X[k]| / (N·G_c)` (1 en k = 0 y N/2), donde `G_c` es la ganancia coherente de la ventana. Un coseno de amplitud A que cae en un punto de la FFT mide A.
+- Marcas del espectro: en ASK y PSK, `fp ± 1/T` son los primeros nulos del lóbulo principal, mientras que la fórmula de ancho de banda de PSK en el Tema 6 es `BW = 1/T`.
+- Espectro de un lado, con ventana rectangular: `A_k = 2|X[k]| / N` (1 en k = 0 y N/2). Un coseno de amplitud A que cae en un punto de la FFT mide A.
 
 ## Estructura del proyecto
 
@@ -150,9 +147,9 @@ src/
 │   ├── modulaciones/    Selector de técnica, formularios AM/ASK/PSK/PSM, historial
 │   ├── graficas/        Envoltorio de Plotly y gráficas de tiempo, espectro y constelación
 │   ├── ecuaciones/      Ecuaciones KaTeX y tabla de variables
-│   ├── resultados/      Resultados y tabla de símbolos
-│   ├── comparacion/     Vista de comparación
-│   └── controles/       Campos numéricos, frecuencia, amplitud, fase, tiempo, bits y barra de simulación
+│   ├── resultados/      Resultados y tabla de símbolos (hoy sin conectar a la interfaz)
+│   ├── comparacion/     Vista de comparación (hoy sin conectar a la interfaz)
+│   └── controles/       Campos numéricos, frecuencia, amplitud, fase, tiempo y bits
 ├── clases/              ConfiguracionSenal, ParametrosModulacion, SenalAnalogica, SenalDigital, MuestraSenal, ResultadoSimulacion
 ├── configuracion/       Valores predeterminados, límites, muestreo, colores de gráficas, interfaz
 ├── formulas/            Ecuaciones de cada técnica (único lugar donde se definen)

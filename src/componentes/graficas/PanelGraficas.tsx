@@ -16,8 +16,10 @@ import { GraficaSenalPortadora } from "./GraficaSenalPortadora";
 
 /** Distribución de las gráficas y selección de las señales visibles. */
 export function PanelGraficas() {
-  const { resultado, visualizacion, alternarGrafica, establecerRangoTiempo, actualizarVisualizacion, espectro, analisis } = useGraficas();
-  const { estadoEjecucion, errores } = useSimulacion();
+  const { resultado, visualizacion, alternarGrafica, establecerRangoTiempo, actualizarVisualizacion, espectro } = useGraficas();
+  const { estadoEjecucion, errores, advertencias } = useSimulacion();
+  // Los avisos con campo ya aparecen junto a su parámetro en el formulario.
+  const avisosCalculo = advertencias.filter((aviso) => !aviso.campo);
 
   if (!resultado) {
     return (
@@ -87,14 +89,16 @@ export function PanelGraficas() {
         </div>
       )}
 
+      {avisosCalculo.length > 0 && <MensajesValidacion errores={[]} advertencias={avisosCalculo} />}
+
       {visibles.moduladora && <GraficaSenalModuladora {...propiedadesTiempo} />}
       {visibles.portadora && <GraficaSenalPortadora {...propiedadesTiempo} />}
       {visibles.modulada && <GraficaSenalModulada {...propiedadesTiempo} />}
 
       {(mostrarEspectro || mostrarConstelacion) && (
-        <div className={`grid gap-3 ${mostrarEspectro && mostrarConstelacion ? "min-[1800px]:grid-cols-[minmax(0,1fr)_420px]" : ""}`}>
+        <div className={`grid gap-3 ${mostrarEspectro && mostrarConstelacion ? "min-[1400px]:grid-cols-[minmax(0,1fr)_420px]" : ""}`}>
           {mostrarEspectro && (
-            <GraficaEspectral resultado={resultado} espectro={espectro} analisis={analisis} visualizacion={visualizacion} actualizar={actualizarVisualizacion} />
+            <GraficaEspectral resultado={resultado} espectro={espectro} visualizacion={visualizacion} actualizar={actualizarVisualizacion} />
           )}
           {mostrarConstelacion && <GraficaConstelacion resultado={resultado} />}
         </div>

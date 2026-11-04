@@ -6,7 +6,6 @@ import {
   rangoDinamicoDecibelios,
   temaGraficas,
   umbralWebGL,
-  ventanasDisponibles,
 } from "@/configuracion/configuracionGraficas";
 import { MotorTransformadaFourier } from "@/motores/MotorTransformadaFourier";
 import type { AnalisisEspectral, EscalaEspectro, ResultadoEspectro, SenalEspectro, TipoVentana } from "@/tipos/tiposGraficas";
@@ -323,7 +322,6 @@ export class ServicioGraficas {
       moduladora: coloresSenales.moduladora,
       portadora: coloresSenales.portadora,
     };
-    const nombreVentana = ventanasDisponibles.find((v) => v.valor === espectro.ventana)?.nombre ?? espectro.ventana;
     const y = espectro.amplitudes.map(convertir);
 
     const datos: Data[] = [
@@ -332,7 +330,7 @@ export class ServicioGraficas {
         mode: "lines",
         x: espectro.frecuencias.map((f) => f * escalaF.factor),
         y,
-        name: `|V(f)| medido (FFT, ventana ${nombreVentana})`,
+        name: "|V(f)| calculado",
         line: { color: colores[opciones.senal], width: 1.6 },
         fill: enDecibelios ? "none" : "tozeroy",
         fillcolor: "rgba(34, 211, 238, 0.08)",

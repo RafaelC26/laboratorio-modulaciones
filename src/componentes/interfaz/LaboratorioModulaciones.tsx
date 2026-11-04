@@ -3,18 +3,15 @@
 import { useEffect } from "react";
 import { hidratarAlmacen, useAlmacenLaboratorio } from "@/estado/almacenLaboratorio";
 import type { TipoModulacion } from "@/tipos/tiposModulacion";
-import { ejecutarSimulacion, useSimulacionDinamica } from "@/hooks/useSimulacion";
-import { EncabezadoAplicacion } from "./EncabezadoAplicacion";
+import { useSimulacionDinamica } from "@/hooks/useSimulacion";
 import { PanelCentral } from "./PanelCentral";
-import { PanelInformacion } from "./PanelInformacion";
 import { PanelLateral } from "./PanelLateral";
-import { PieAplicacion } from "./PieAplicacion";
 
 const TECNICAS_ENLAZABLES: TipoModulacion[] = ["AM", "ASK", "PSK", "PSM"];
 
 /**
- * Raíz del laboratorio: tres paneles en escritorio (sección 11.1) y una sola
- * columna en pantallas pequeñas.
+ * Raíz del laboratorio: parámetros a la izquierda y gráficas a la derecha en
+ * escritorio; una sola columna en pantallas pequeñas.
  */
 export function LaboratorioModulaciones() {
   useEffect(() => {
@@ -29,26 +26,13 @@ export function LaboratorioModulaciones() {
 
   useSimulacionDinamica();
 
-  useEffect(() => {
-    const atajo = (evento: KeyboardEvent) => {
-      if ((evento.ctrlKey || evento.metaKey) && evento.key === "Enter") {
-        evento.preventDefault();
-        ejecutarSimulacion();
-      }
-    };
-    window.addEventListener("keydown", atajo);
-    return () => window.removeEventListener("keydown", atajo);
-  }, []);
-
   return (
-    <div className="flex min-h-dvh flex-col xl:h-dvh">
-      <EncabezadoAplicacion />
-      <main className="grid flex-1 grid-cols-[minmax(0,1fr)] gap-3 p-3 lg:grid-cols-[320px_minmax(0,1fr)] xl:min-h-0 xl:grid-cols-[320px_minmax(0,1fr)_380px]">
-        <PanelLateral className="xl:min-h-0 xl:overflow-y-auto xl:pr-1" />
-        <PanelCentral className="min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-1" />
-        <PanelInformacion className="lg:col-span-2 xl:col-span-1 xl:min-h-0 xl:overflow-y-auto xl:pr-1" />
+    <div className="flex min-h-dvh flex-col lg:h-dvh">
+      <h1 className="sr-only">Laboratorio Virtual de Modulaciones</h1>
+      <main className="grid flex-1 grid-cols-[minmax(0,1fr)] gap-3 p-3 lg:min-h-0 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <PanelLateral className="lg:min-h-0 lg:overflow-y-auto lg:pr-1" />
+        <PanelCentral className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-1" />
       </main>
-      <PieAplicacion />
     </div>
   );
 }
