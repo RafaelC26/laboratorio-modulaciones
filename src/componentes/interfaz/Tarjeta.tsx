@@ -12,7 +12,6 @@ interface PropiedadesTarjeta {
   /** Si es true, la tarjeta se puede plegar (útil en móviles). */
   plegable?: boolean;
   abierta?: boolean;
-  sinRelleno?: boolean;
 }
 
 const claseContenedor = "rounded-xl border border-grafito-700/80 bg-grafito-900/90 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]";
@@ -33,8 +32,8 @@ function Encabezado({ titulo, subtitulo, acciones, color, plegable }: Omit<Propi
   );
 }
 
-export function Tarjeta({ children, className = "", plegable, abierta = true, sinRelleno, ...encabezado }: PropiedadesTarjeta) {
-  const cuerpo = <div className={sinRelleno ? "" : "px-4 pb-4"}>{children}</div>;
+export function Tarjeta({ children, className = "", plegable, abierta = true, ...encabezado }: PropiedadesTarjeta) {
+  const cuerpo = <div className="px-4 pb-4">{children}</div>;
   if (plegable) {
     return (
       <details open={abierta} className={`${claseContenedor} ${className}`}>

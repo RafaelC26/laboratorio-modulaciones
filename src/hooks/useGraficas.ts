@@ -14,10 +14,7 @@ export function useGraficas() {
   const actualizarVisualizacion = useAlmacenLaboratorio((s) => s.actualizarVisualizacion);
   const alternarGrafica = useAlmacenLaboratorio((s) => s.alternarGrafica);
 
-  const espectro = useMemo(
-    () => (resultado ? servicioGraficas.calcularEspectro(resultado, "modulada", "rectangular") : null),
-    [resultado],
-  );
+  const espectro = useMemo(() => (resultado ? servicioGraficas.calcularEspectro(resultado) : null), [resultado]);
 
   /** Recibe el rango en la unidad del eje (ms, µs…) y lo guarda en segundos. */
   const establecerRangoTiempo = useCallback(

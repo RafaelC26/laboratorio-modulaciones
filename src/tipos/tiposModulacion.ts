@@ -91,6 +91,4 @@ export interface DescripcionTecnica {
   nombre: string;
   categoria: CategoriaModulacion;
   caracteristica: string;
-  /** Observaciones didácticas que se muestran en el panel de información. */
-  observaciones: string[];
 }

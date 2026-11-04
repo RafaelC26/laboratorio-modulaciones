@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Config, Data, Layout, PlotlyHTMLElement } from "plotly.js";
-import { servicioExportacion } from "@/servicios/ServicioExportacion";
 import type { RangoTiempo } from "@/servicios/ServicioGraficas";
 import { cargarPlotly } from "@/utilidades/cargadorPlotly";
 
 interface PropiedadesGraficaPlotly {
   datos: Data[];
   diseno: Partial<Layout>;
-  /** Identificador único: nombre del PNG exportado y registro para "Exportar gráficas". */
+  /** Nombre del PNG que se descarga con el icono de cámara de la gráfica. */
   identificador: string;
   /** Recibe el rango del eje x (en sus unidades) cuando el usuario hace zoom; null al restablecer. */
   alCambiarRangoX?: (rango: RangoTiempo) => void;
@@ -77,7 +76,6 @@ export function GraficaPlotly({ datos, diseno, identificador, alCambiarRangoX }:
   useEffect(() => {
     const elemento = contenedor.current;
     if (!elemento) return;
-    servicioExportacion.registrarGrafica(identificador, elemento);
     const observador = new ResizeObserver(() => {
       cargarPlotly().then((Plotly) => {
         if (elemento.isConnected && (elemento as unknown as { _fullLayout?: unknown })._fullLayout) {
@@ -88,11 +86,10 @@ export function GraficaPlotly({ datos, diseno, identificador, alCambiarRangoX }:
     observador.observe(elemento);
     return () => {
       observador.disconnect();
-      servicioExportacion.eliminarGrafica(identificador);
       eventosRegistrados.current = false;
       cargarPlotly().then((Plotly) => Plotly.purge(elemento));
     };
-  }, [identificador]);
+  }, []);
 
   return (
     <div className="relative w-full" style={{ minHeight: diseno.height }}>

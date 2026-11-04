@@ -8,7 +8,7 @@ import {
   umbralWebGL,
 } from "@/configuracion/configuracionGraficas";
 import { MotorTransformadaFourier } from "@/motores/MotorTransformadaFourier";
-import type { AnalisisEspectral, EscalaEspectro, ResultadoEspectro, SenalEspectro, TipoVentana } from "@/tipos/tiposGraficas";
+import type { EscalaEspectro, ResultadoEspectro } from "@/tipos/tiposGraficas";
 import type { SenalAuxiliarCalculada } from "@/tipos/tiposSimulacion";
 import { amplitudADecibelios } from "@/utilidades/calculoDecibelios";
 import {
@@ -38,7 +38,7 @@ const MAXIMO_ETIQUETAS_SIMBOLO = 48;
 const MAXIMO_LIMITES_SIMBOLO = 200;
 
 const cacheTiempo = new WeakMap<ResultadoSimulacion, Float64Array>();
-const cacheEspectros = new WeakMap<ResultadoSimulacion, Map<string, ResultadoEspectro>>();
+const cacheEspectros = new WeakMap<ResultadoSimulacion, ResultadoEspectro>();
 
 /**
  * Prepara los datos y el diseño de cada gráfica a partir de un resultado.
@@ -272,56 +272,33 @@ export class ServicioGraficas {
     return { datos, diseno };
   }
 
-  calcularEspectro(resultado: ResultadoSimulacion, senal: SenalEspectro, ventana: TipoVentana): ResultadoEspectro {
-    let porResultado = cacheEspectros.get(resultado);
-    if (!porResultado) {
-      porResultado = new Map();
-      cacheEspectros.set(resultado, porResultado);
-    }
-    const clave = `${senal}|${ventana}`;
-    let espectro = porResultado.get(clave);
+  /** Espectro de un lado de la señal modulada, con ventana rectangular. */
+  calcularEspectro(resultado: ResultadoSimulacion): ResultadoEspectro {
+    let espectro = cacheEspectros.get(resultado);
     if (!espectro) {
-      espectro = MotorTransformadaFourier.espectroAmplitud(resultado.obtenerSenal(senal).amplitudes, resultado.frecuenciaMuestreo, ventana);
-      porResultado.set(clave, espectro);
+      espectro = MotorTransformadaFourier.espectroAmplitud(resultado.senalModulada.amplitudes, resultado.frecuenciaMuestreo, "rectangular");
+      cacheEspectros.set(resultado, espectro);
     }
     return espectro;
   }
 
-  analizarEspectro(espectro: ResultadoEspectro): AnalisisEspectral {
-    return MotorTransformadaFourier.analizar(espectro);
-  }
-
   /** Intervalo de frecuencias que se muestra inicialmente en el espectro [Hz]. */
-  rangoFrecuenciaSugerido(resultado: ResultadoSimulacion, senal: SenalEspectro): [number, number] {
+  private rangoFrecuenciaSugerido(resultado: ResultadoSimulacion): [number, number] {
     const nyquist = resultado.frecuenciaMuestreo / 2;
-    const fc = resultado.resumen.frecuenciaCentral;
+    const fp = resultado.resumen.frecuenciaCentral;
     const ancho = Math.max(resultado.resumen.anchoBandaEstimado, 1e-12);
-    let rango: [number, number];
-    if (senal === "modulada") {
-      rango = [Math.max(0, fc - 3 * ancho), fc + 3 * ancho];
-    } else if (senal === "portadora") {
-      rango = [0, 2 * fc];
-    } else {
-      const referencia = resultado.parametros.esDigital ? resultado.parametros.tasaBits : resultado.parametros.frecuenciaModuladora;
-      rango = [0, 8 * referencia];
-    }
-    return [rango[0], Math.min(rango[1], nyquist)];
+    return [Math.max(0, fp - 3 * ancho), Math.min(fp + 3 * ancho, nyquist)];
   }
 
   figuraEspectro(
     resultado: ResultadoSimulacion,
     espectro: ResultadoEspectro,
-    opciones: { escala: EscalaEspectro; mostrarTeorico: boolean; senal: SenalEspectro },
+    opciones: { escala: EscalaEspectro; mostrarTeorico: boolean },
   ): FiguraPlotly {
-    const sugerido = this.rangoFrecuenciaSugerido(resultado, opciones.senal);
+    const sugerido = this.rangoFrecuenciaSugerido(resultado);
     const escalaF = escalaFrecuenciaParaMaximo(sugerido[1]);
     const enDecibelios = opciones.escala === "decibelios";
     const convertir = (amplitud: number) => (enDecibelios ? amplitudADecibelios(amplitud) : amplitud);
-    const colores: Record<SenalEspectro, string> = {
-      modulada: coloresSenales.modulada,
-      moduladora: coloresSenales.moduladora,
-      portadora: coloresSenales.portadora,
-    };
     const y = espectro.amplitudes.map(convertir);
 
     const datos: Data[] = [
@@ -331,14 +308,14 @@ export class ServicioGraficas {
         x: espectro.frecuencias.map((f) => f * escalaF.factor),
         y,
         name: "|V(f)| calculado",
-        line: { color: colores[opciones.senal], width: 1.6 },
+        line: { color: coloresSenales.modulada, width: 1.6 },
         fill: enDecibelios ? "none" : "tozeroy",
         fillcolor: "rgba(34, 211, 238, 0.08)",
         hovertemplate: `%{x:.5g} ${escalaF.etiqueta}: %{y:.4g} ${enDecibelios ? "dBV" : "V"}<extra></extra>`,
       },
     ];
 
-    if (opciones.mostrarTeorico && opciones.senal === "modulada" && resultado.componentesTeoricos.length) {
+    if (opciones.mostrarTeorico && resultado.componentesTeoricos.length) {
       const componentes = resultado.componentesTeoricos;
       datos.push({
         type: "scatter",
@@ -364,7 +341,7 @@ export class ServicioGraficas {
       for (let i = 0; i < y.length; i++) if (y[i] > maximo) maximo = y[i];
       diseno.yaxis = { ...diseno.yaxis, range: [maximo - rangoDinamicoDecibelios, maximo + 6], autorange: false };
     }
-    if (opciones.senal === "modulada" && opciones.mostrarTeorico) {
+    if (opciones.mostrarTeorico) {
       diseno.shapes = resultado.marcasFrecuencia.map((marca) => ({
         type: "line",
         xref: "x",

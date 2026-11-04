@@ -7,7 +7,6 @@ import type {
 
 export const configuracionGeneral = {
   nombreAplicacion: "Laboratorio Virtual de Modulaciones",
-  descripcion: "Sistema interactivo de simulación y visualización de señales de comunicaciones",
   version: "1.0.0",
   /** Órdenes de modulación PSK disponibles (M = 2^k). */
   ordenesPSK: [2, 4, 8, 16] as const,
@@ -23,14 +22,6 @@ export const tecnicasDisponibles: DescripcionTecnica[] = [
     nombre: "Modulación de amplitud",
     categoria: "analogica",
     caracteristica: "La amplitud de la portadora varía según la señal moduladora.",
-    observaciones: [
-      "Con m = 0 la señal modulada es la portadora sin cambios.",
-      "Con M < 100 % no hay distorsión: la envolvente reproduce la moduladora.",
-      "Con M = 100 % (m = 1) la envolvente llega a cero.",
-      "Con M > 100 % hay sobremodulación (zonas rojas): aparece distorsión y frecuencias no deseadas.",
-      "En el espectro aparecen la portadora en f_p y las frecuencias laterales f_p ± f_m, de amplitud mV_p/2.",
-      "Con m = 1, la portadora consume 2/3 de la potencia total y las bandas laterales solo 1/3.",
-    ],
   },
   {
     tipo: "ASK",
@@ -38,12 +29,6 @@ export const tecnicasDisponibles: DescripcionTecnica[] = [
     nombre: "Modulación por desplazamiento de amplitud",
     categoria: "digital",
     caracteristica: "La amplitud de la portadora cambia según los símbolos digitales.",
-    observaciones: [
-      "Con A₁ = V_p y A₀ = 0 se obtiene el caso del Tema 6: portadora presente en los 1 y ausente en los 0.",
-      "Si f_p·T_bit es entero, cada bit contiene un número exacto de ciclos de portadora.",
-      "El espectro tiene la forma sen x/x de la secuencia de pulsos, trasladada a f_p.",
-      "Complemento: en la constelación, ASK es un conjunto de puntos sobre el eje I.",
-    ],
   },
   {
     tipo: "PSK",
@@ -51,14 +36,6 @@ export const tecnicasDisponibles: DescripcionTecnica[] = [
     nombre: "Modulación por desplazamiento de fase",
     categoria: "digital",
     caracteristica: "La fase de la portadora cambia entre N valores; amplitud y frecuencia constantes.",
-    observaciones: [
-      "2PSK: la moduladora vale +1 para un 1 (fase 0) y −1 para un 0 (fase π).",
-      "4PSK o QPSK: cuatro fases separadas θ = π/2; cada dibit lleva 2 bits y T_dibit = 2T_bit.",
-      "V_t = (1/T)·log₂N: al aumentar N sube la velocidad de transmisión sin cambiar la de modulación.",
-      "Para la misma V_t, los dibits requieren la mitad del ancho de banda que los bits.",
-      "Los saltos de fase aparecen en los límites de símbolo (líneas punteadas verticales).",
-      "4PSK es más sensible a las interferencias: para igual tasa de error requiere 3 dB más de relación señal/ruido.",
-    ],
   },
   {
     tipo: "PSM",
@@ -66,13 +43,6 @@ export const tecnicasDisponibles: DescripcionTecnica[] = [
     nombre: "Modulación de fase (PM)",
     categoria: "analogica",
     caracteristica: "La fase de la portadora varía proporcionalmente a la moduladora: Φ(t) = ΔΦ·v_m(t).",
-    observaciones: [
-      "PSM es la modulación de fase analógica, que el Tema 6 llama PM.",
-      "La amplitud es constante; la información está en la fase.",
-      "β = ΔΦ·V_m no depende de f_m: si f_m cambia con V_m fija, solo se altera la separación entre las rayas del espectro.",
-      "Con β < π/2 es de banda angosta y BW = 2f_m.",
-      "Complementos (no están en el Tema 6): la frecuencia instantánea f_i(t), las rayas V_p|J_n(β)| con funciones de Bessel y la regla de Carson BW ≈ 2(β + 1)f_m.",
-    ],
   },
 ];
 

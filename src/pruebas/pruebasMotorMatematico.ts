@@ -6,7 +6,7 @@ import { besselJ } from "@/formulas/formulasPSM";
 import { motorMatematico } from "@/motores/MotorMatematico";
 import { MotorTransformadaFourier } from "@/motores/MotorTransformadaFourier";
 import { MotorMuestreo } from "@/motores/MotorMuestreo";
-import { ServicioSimulacion } from "@/servicios/ServicioSimulacion";
+import { etiquetaEntrada, ServicioSimulacion } from "@/servicios/ServicioSimulacion";
 import { ServicioValidacion } from "@/servicios/ServicioValidacion";
 import type { TipoModulacion } from "@/tipos/tiposModulacion";
 
@@ -155,19 +155,12 @@ describe("Transformada de Fourier", () => {
   });
 });
 
-describe("Exportación", () => {
-  it("genera un CSV con una fila por muestra y un reporte con la ecuación", async () => {
-    const { servicioExportacion } = await import("@/servicios/ServicioExportacion");
-    const operacion = servicio.simular(valoresPredeterminados.PSK);
-    expect(operacion.exito).toBe(true);
-    if (!operacion.exito) return;
-    const lineas = servicioExportacion.generarCSV(operacion.resultado).split("\n");
-    expect(lineas).toHaveLength(operacion.resultado.cantidadMuestras + 1);
-    expect(lineas[0]).toContain("t [s]");
-    expect(lineas[1].split(",")).toHaveLength(5); // t, vm(t), vp(t), v(t), fase
-    const reporte = servicioExportacion.generarReporte(operacion.resultado);
-    expect(reporte).toContain(operacion.resultado.ecuacion);
-    expect(JSON.parse(servicioExportacion.generarJSON(operacion.resultado)).tecnica).toBe("PSK");
+describe("Historial de simulaciones", () => {
+  it("describe cada configuración con la notación del Tema 6", () => {
+    expect(etiquetaEntrada(valoresPredeterminados.AM)).toBe("AM · m=0.5 · fp=1 kHz · fm=100 Hz");
+    expect(etiquetaEntrada(valoresPredeterminados.ASK)).toBe("OOK · 10110 · Tbit=5 ms · fp=1 kHz");
+    expect(etiquetaEntrada(valoresPredeterminados.PSK)).toBe("2PSK (BPSK) · 12 bits · T=2 ms · fp=1 kHz");
+    expect(etiquetaEntrada(valoresPredeterminados.PSM)).toBe("PSM · β=2 rad · fp=1 kHz · fm=100 Hz");
   });
 });
 

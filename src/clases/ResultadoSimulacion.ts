@@ -94,10 +94,4 @@ export class ResultadoSimulacion {
   get tiempo(): Float64Array {
     return this.senalModulada.tiempo;
   }
-
-  obtenerSenal(identificador: "moduladora" | "portadora" | "modulada"): SenalAnalogica {
-    if (identificador === "moduladora") return this.senalModuladora;
-    if (identificador === "portadora") return this.senalPortadora;
-    return this.senalModulada;
-  }
 }

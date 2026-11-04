@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { configuracionInterfaz } from "@/configuracion/configuracionInterfaz";
 import { useAlmacenLaboratorio } from "@/estado/almacenLaboratorio";
 import { servicioSimulacion } from "@/servicios/ServicioSimulacion";
@@ -25,32 +25,12 @@ export function ejecutarSimulacion({ soloSiCambio = false } = {}): void {
   if (operacion.exito) actual.agregarAlHistorial(operacion.resultado);
 }
 
-/** Estado de la simulación y acción para ejecutarla (modo manual). */
+/** Estado de la última simulación. */
 export function useSimulacion() {
-  const resultado = useAlmacenLaboratorio((s) => s.resultado);
   const estadoEjecucion = useAlmacenLaboratorio((s) => s.estadoEjecucion);
   const errores = useAlmacenLaboratorio((s) => s.errores);
   const advertencias = useAlmacenLaboratorio((s) => s.advertencias);
-  const modoDinamico = useAlmacenLaboratorio((s) => s.modoDinamico);
-  const establecerModoDinamico = useAlmacenLaboratorio((s) => s.establecerModoDinamico);
-  const entradaActual = useAlmacenLaboratorio((s) => s.entradas[s.tipoSeleccionado]);
-  const tipoSeleccionado = useAlmacenLaboratorio((s) => s.tipoSeleccionado);
-
-  const ejecutar = useCallback(() => ejecutarSimulacion(), []);
-
-  const hayCambiosPendientes =
-    !resultado || resultado.tipo !== tipoSeleccionado || JSON.stringify(resultado.entrada) !== JSON.stringify(entradaActual);
-
-  return {
-    resultado,
-    estadoEjecucion,
-    errores,
-    advertencias,
-    modoDinamico,
-    establecerModoDinamico,
-    ejecutar,
-    hayCambiosPendientes,
-  };
+  return { estadoEjecucion, errores, advertencias };
 }
 
 /**

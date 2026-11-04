@@ -150,23 +150,4 @@ export class ParametrosModulacion implements CamposParametros {
   get esDigital(): boolean {
     return this.tipoModulacion === "ASK" || this.tipoModulacion === "PSK";
   }
-
-  aObjetoPlano(): CamposParametros {
-    return {
-      tipoModulacion: this.tipoModulacion,
-      amplitudPortadora: this.amplitudPortadora,
-      frecuenciaPortadora: this.frecuenciaPortadora,
-      faseInicial: this.faseInicial,
-      amplitudModuladora: this.amplitudModuladora,
-      frecuenciaModuladora: this.frecuenciaModuladora,
-      indiceModulacion: this.indiceModulacion,
-      sensibilidadFase: this.sensibilidadFase,
-      secuenciaBits: [...this.secuenciaBits],
-      amplitudBit1: this.amplitudBit1,
-      amplitudBit0: this.amplitudBit0,
-      duracionSimbolo: this.duracionSimbolo,
-      ordenModulacion: this.ordenModulacion,
-      mapeoSimbolos: this.mapeoSimbolos,
-    };
-  }
 }

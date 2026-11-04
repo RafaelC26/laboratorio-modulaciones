@@ -8,15 +8,9 @@ export type TipoVentana = "rectangular" | "hann" | "hamming" | "blackman";
 
 export type EscalaEspectro = "lineal" | "decibelios";
 
-export type SenalEspectro = "modulada" | "moduladora" | "portadora";
-
-export type VistaLaboratorio = "laboratorio" | "comparacion";
-
 export interface EstadoVisualizacion {
   visibles: Record<IdGrafica, boolean>;
-  ventana: TipoVentana;
   escalaEspectro: EscalaEspectro;
-  senalEspectro: SenalEspectro;
   mostrarTeorico: boolean;
   /** Rango temporal sincronizado entre las gráficas de tiempo [s]; null = rango completo. */
   rangoTiempo: [number, number] | null;
@@ -32,14 +26,4 @@ export interface ResultadoEspectro {
   frecuenciaMuestreo: number;
   cantidadMuestras: number;
   ventana: TipoVentana;
-}
-
-export interface AnalisisEspectral {
-  frecuenciaPico: number;
-  amplitudPico: number;
-  frecuenciaCentroide: number;
-  anchoBandaOcupado: number;
-  limiteInferior: number;
-  limiteSuperior: number;
-  fraccionPotencia: number;
 }

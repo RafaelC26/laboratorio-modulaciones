@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { EcuacionModulacion } from "@/componentes/ecuaciones/EcuacionModulacion";
-import { LogoLaboratorio } from "@/componentes/interfaz/EncabezadoAplicacion";
+import { LogoLaboratorio } from "@/componentes/interfaz/LogoLaboratorio";
 import { configuracionGeneral, tecnicasDisponibles } from "@/configuracion/configuracionGeneral";
 import { obtenerConjuntoFormulas } from "@/formulas/repositorioFormulas";
 

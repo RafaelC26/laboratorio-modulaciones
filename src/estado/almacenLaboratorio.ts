@@ -4,8 +4,8 @@ import type { ResultadoSimulacion } from "@/clases/ResultadoSimulacion";
 import { valoresPredeterminados } from "@/configuracion/configuracionGeneral";
 import { visualizacionPredeterminada } from "@/configuracion/configuracionGraficas";
 import { configuracionInterfaz } from "@/configuracion/configuracionInterfaz";
-import { servicioComparacion } from "@/servicios/ServicioComparacion";
-import type { EstadoVisualizacion, IdGrafica, VistaLaboratorio } from "@/tipos/tiposGraficas";
+import { etiquetaEntrada } from "@/servicios/ServicioSimulacion";
+import type { EstadoVisualizacion, IdGrafica } from "@/tipos/tiposGraficas";
 import type { ConfiguracionTemporal, EntradasPorTecnica, TipoModulacion } from "@/tipos/tiposModulacion";
 import type {
   EstadoEjecucion,
@@ -16,23 +16,20 @@ import type {
 
 /**
  * Estado global del laboratorio (sección 15): configuración, simulación,
- * historial, comparación y visualización. La configuración, el historial y las
- * preferencias de visualización se guardan en el navegador.
+ * historial y visualización. La configuración, el historial y las preferencias
+ * de visualización se guardan en el navegador.
  */
 export interface EstadoLaboratorio {
   // Estado de configuración
   tipoSeleccionado: TipoModulacion;
   entradas: EntradasPorTecnica;
-  modoDinamico: boolean;
-  vista: VistaLaboratorio;
   // Estado de simulación
   resultado: ResultadoSimulacion | null;
   estadoEjecucion: EstadoEjecucion;
   errores: MensajeValidacion[];
   advertencias: MensajeValidacion[];
-  // Historial y comparación
+  // Historial
   historial: RegistroHistorial[];
-  comparacion: ResultadoSimulacion[];
   // Estado de visualización
   visualizacion: EstadoVisualizacion;
   hidratado: boolean;
@@ -41,17 +38,11 @@ export interface EstadoLaboratorio {
   actualizarEntrada: <T extends TipoModulacion>(tipo: T, cambios: Partial<EntradasPorTecnica[T]>) => void;
   actualizarTemporal: (tipo: TipoModulacion, cambios: Partial<ConfiguracionTemporal>) => void;
   reiniciarTecnica: (tipo: TipoModulacion) => void;
-  restaurarTodo: () => void;
-  establecerModoDinamico: (activo: boolean) => void;
-  establecerVista: (vista: VistaLaboratorio) => void;
   iniciarEjecucion: () => void;
   finalizarEjecucion: (operacion: ResultadoOperacionSimulacion) => void;
   agregarAlHistorial: (resultado: ResultadoSimulacion) => void;
   cargarDesdeHistorial: (id: string) => void;
   limpiarHistorial: () => void;
-  agregarAComparacion: (resultado: ResultadoSimulacion) => boolean;
-  quitarDeComparacion: (id: string) => void;
-  limpiarComparacion: () => void;
   actualizarVisualizacion: (cambios: Partial<EstadoVisualizacion>) => void;
   alternarGrafica: (id: IdGrafica) => void;
 }
@@ -60,7 +51,7 @@ function copiaPredeterminados(): EntradasPorTecnica {
   return structuredClone(valoresPredeterminados);
 }
 
-type EstadoPersistido = Pick<EstadoLaboratorio, "tipoSeleccionado" | "entradas" | "modoDinamico" | "historial"> & {
+type EstadoPersistido = Pick<EstadoLaboratorio, "tipoSeleccionado" | "entradas" | "historial"> & {
   visualizacion: Omit<EstadoVisualizacion, "rangoTiempo">;
 };
 
@@ -69,18 +60,15 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
     (set, get) => ({
       tipoSeleccionado: "AM",
       entradas: copiaPredeterminados(),
-      modoDinamico: true,
-      vista: "laboratorio",
       resultado: null,
       estadoEjecucion: "inactivo",
       errores: [],
       advertencias: [],
       historial: [],
-      comparacion: [],
       visualizacion: structuredClone(visualizacionPredeterminada),
       hidratado: false,
 
-      seleccionarTipo: (tipo) => set({ tipoSeleccionado: tipo, vista: "laboratorio" }),
+      seleccionarTipo: (tipo) => set({ tipoSeleccionado: tipo }),
 
       actualizarEntrada: (tipo, cambios) =>
         set((estado) => ({
@@ -97,17 +85,6 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
 
       reiniciarTecnica: (tipo) =>
         set((estado) => ({ entradas: { ...estado.entradas, [tipo]: structuredClone(valoresPredeterminados[tipo]) } })),
-
-      restaurarTodo: () =>
-        set({
-          entradas: copiaPredeterminados(),
-          visualizacion: structuredClone(visualizacionPredeterminada),
-          modoDinamico: true,
-        }),
-
-      establecerModoDinamico: (activo) => set({ modoDinamico: activo }),
-
-      establecerVista: (vista) => set({ vista }),
 
       iniciarEjecucion: () => set({ estadoEjecucion: "calculando" }),
 
@@ -135,7 +112,7 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
             id: resultado.id,
             fecha: resultado.fechaEjecucion.getTime(),
             tipo: resultado.tipo,
-            etiqueta: servicioComparacion.etiquetaEntrada(resultado.entrada),
+            etiqueta: etiquetaEntrada(resultado.entrada),
             entrada: structuredClone(resultado.entrada),
           };
           const [ultimo, ...resto] = estado.historial;
@@ -154,24 +131,11 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
           if (!registro) return {};
           return {
             tipoSeleccionado: registro.tipo,
-            vista: "laboratorio",
             entradas: { ...estado.entradas, [registro.tipo]: structuredClone(registro.entrada) },
           };
         }),
 
       limpiarHistorial: () => set({ historial: [] }),
-
-      agregarAComparacion: (resultado) => {
-        const { comparacion } = get();
-        if (comparacion.some((r) => r.id === resultado.id)) return false;
-        if (comparacion.length >= configuracionInterfaz.maximoComparacion) return false;
-        set({ comparacion: [...comparacion, resultado] });
-        return true;
-      },
-
-      quitarDeComparacion: (id) => set((estado) => ({ comparacion: estado.comparacion.filter((r) => r.id !== id) })),
-
-      limpiarComparacion: () => set({ comparacion: [] }),
 
       actualizarVisualizacion: (cambios) => set((estado) => ({ visualizacion: { ...estado.visualizacion, ...cambios } })),
 
@@ -198,13 +162,10 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
       partialize: (estado): EstadoPersistido => ({
         tipoSeleccionado: estado.tipoSeleccionado,
         entradas: estado.entradas,
-        modoDinamico: estado.modoDinamico,
         historial: estado.historial,
         visualizacion: {
           visibles: estado.visualizacion.visibles,
-          ventana: estado.visualizacion.ventana,
           escalaEspectro: estado.visualizacion.escalaEspectro,
-          senalEspectro: estado.visualizacion.senalEspectro,
           mostrarTeorico: estado.visualizacion.mostrarTeorico,
         },
       }),
@@ -221,7 +182,6 @@ export const useAlmacenLaboratorio = create<EstadoLaboratorio>()(
         return {
           ...actual,
           tipoSeleccionado: guardado.tipoSeleccionado ?? actual.tipoSeleccionado,
-          modoDinamico: guardado.modoDinamico ?? actual.modoDinamico,
           historial: Array.isArray(guardado.historial) ? guardado.historial : [],
           entradas,
           visualizacion: {

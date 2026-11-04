@@ -65,11 +65,6 @@ export function terminoFaseLatex(radianes: number, cifras = 4): string {
   return `${signo}${numeroLatex(Math.abs(radianes), cifras)}`;
 }
 
-/** Tiempo de cálculo en ms; el reloj del navegador tiene una resolución de ~0.1 ms. */
-export function formatearDuracionCalculo(milisegundos: number): string {
-  return milisegundos < 0.1 ? "< 0.1 ms" : `${formatearNumero(milisegundos, 3)} ms`;
-}
-
 export function formatearPorcentaje(fraccion: number, cifras = 3): string {
   return `${formatearNumero(fraccion * 100, cifras)} %`;
 }

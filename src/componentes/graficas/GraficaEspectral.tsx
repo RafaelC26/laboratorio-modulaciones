@@ -23,7 +23,6 @@ export function GraficaEspectral({ resultado, espectro, visualizacion, actualiza
       servicioGraficas.figuraEspectro(resultado, espectro, {
         escala: visualizacion.escalaEspectro,
         mostrarTeorico: visualizacion.mostrarTeorico,
-        senal: "modulada",
       }),
     [resultado, espectro, visualizacion.escalaEspectro, visualizacion.mostrarTeorico],
   );

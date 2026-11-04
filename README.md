@@ -143,18 +143,16 @@ Sus ecuaciones están en `src/formulas/formulasPSM.ts`; las señales auxiliares 
 src/
 ├── app/                 Páginas de Next.js (inicio y /laboratorio)
 ├── componentes/
-│   ├── interfaz/        Encabezado, menú, paneles, pie, tarjetas
+│   ├── interfaz/        Raíz del laboratorio, paneles, logo, tarjetas e iconos
 │   ├── modulaciones/    Selector de técnica, formularios AM/ASK/PSK/PSM, historial
 │   ├── graficas/        Envoltorio de Plotly y gráficas de tiempo, espectro y constelación
-│   ├── ecuaciones/      Ecuaciones KaTeX y tabla de variables
-│   ├── resultados/      Resultados y tabla de símbolos (hoy sin conectar a la interfaz)
-│   ├── comparacion/     Vista de comparación (hoy sin conectar a la interfaz)
+│   ├── ecuaciones/      Representación de ecuaciones con KaTeX
 │   └── controles/       Campos numéricos, frecuencia, amplitud, fase, tiempo y bits
 ├── clases/              ConfiguracionSenal, ParametrosModulacion, SenalAnalogica, SenalDigital, MuestraSenal, ResultadoSimulacion
 ├── configuracion/       Valores predeterminados, límites, muestreo, colores de gráficas, interfaz
 ├── formulas/            Ecuaciones de cada técnica (único lugar donde se definen)
 ├── motores/             Motor matemático, un motor por técnica, muestreo, FFT y constelación
-├── servicios/           Simulación, validación, gráficas, exportación, comparación y gestor de fórmulas
+├── servicios/           Simulación, validación y gráficas
 ├── estado/              Estado global (Zustand)
 ├── hooks/               useConfiguracionModulacion, useParametros, useSimulacion, useGraficas
 ├── tipos/               Tipos de modulación, señales, gráficas, simulación y fórmulas

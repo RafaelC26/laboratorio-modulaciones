@@ -1,8 +1,31 @@
 import { ParametrosModulacion } from "@/clases/ParametrosModulacion";
+import { indiceModulacionAM } from "@/formulas/formulasAM";
+import { nombreVariantePSK } from "@/formulas/formulasPSK";
+import { indiceModulacionFase } from "@/formulas/formulasPSM";
 import { motorMatematico, type MotorMatematico } from "@/motores/MotorMatematico";
 import type { EntradaModulacion } from "@/tipos/tiposModulacion";
 import type { ResultadoOperacionSimulacion } from "@/tipos/tiposSimulacion";
+import { formatearConUnidad, formatearNumero } from "@/utilidades/formatoNumerico";
+import { limpiarSecuenciaBits } from "@/utilidades/validacionNumerica";
 import { ServicioValidacion } from "./ServicioValidacion";
+
+/** Descripción corta de una configuración, para el historial de simulaciones. */
+export function etiquetaEntrada(entrada: EntradaModulacion): string {
+  const fp = formatearConUnidad(entrada.frecuenciaPortadora, "Hz", 3);
+  switch (entrada.tipo) {
+    case "AM":
+      return `AM · m=${formatearNumero(indiceModulacionAM(entrada), 3)} · fp=${fp} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
+    case "ASK": {
+      const bits = limpiarSecuenciaBits(entrada.secuenciaBits);
+      const resumenBits = bits.length > 12 ? `${bits.slice(0, 12)}…` : bits;
+      return `${entrada.amplitudBit0 === 0 ? "OOK" : "ASK"} · ${resumenBits} · Tbit=${formatearConUnidad(entrada.duracionBit, "s", 3)} · fp=${fp}`;
+    }
+    case "PSK":
+      return `${nombreVariantePSK(entrada.ordenModulacion)} · ${limpiarSecuenciaBits(entrada.secuenciaBits).length} bits · T=${formatearConUnidad(entrada.duracionSimbolo, "s", 3)} · fp=${fp}`;
+    case "PSM":
+      return `PSM · β=${formatearNumero(indiceModulacionFase(entrada), 3)} rad · fp=${fp} · fm=${formatearConUnidad(entrada.frecuenciaModuladora, "Hz", 3)}`;
+  }
+}
 
 /**
  * Punto de entrada de la interfaz al cálculo: valida, convierte la entrada del

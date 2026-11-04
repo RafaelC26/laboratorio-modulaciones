@@ -1,15 +1,10 @@
-"use client";
-
-import { PanelComparacion } from "@/componentes/comparacion/PanelComparacion";
 import { PanelGraficas } from "@/componentes/graficas/PanelGraficas";
-import { useAlmacenLaboratorio } from "@/estado/almacenLaboratorio";
 
-/** Panel central: gráficas del laboratorio o vista de comparación. */
+/** Panel central: gráficas del laboratorio. */
 export function PanelCentral({ className = "" }: { className?: string }) {
-  const vista = useAlmacenLaboratorio((s) => s.vista);
   return (
-    <section aria-label={vista === "laboratorio" ? "Visualización" : "Comparación"} className={`desplazable ${className}`}>
-      {vista === "laboratorio" ? <PanelGraficas /> : <PanelComparacion />}
+    <section aria-label="Visualización" className={`desplazable ${className}`}>
+      <PanelGraficas />
     </section>
   );
 }

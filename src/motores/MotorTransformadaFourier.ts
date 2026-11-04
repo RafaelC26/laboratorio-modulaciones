@@ -5,7 +5,7 @@ import {
   generarVentana,
   resolucionFrecuencial,
 } from "@/formulas/formulasEspectro";
-import type { AnalisisEspectral, ResultadoEspectro, TipoVentana } from "@/tipos/tiposGraficas";
+import type { ResultadoEspectro, TipoVentana } from "@/tipos/tiposGraficas";
 import { esPotenciaDeDos } from "@/utilidades/validacionNumerica";
 
 interface Complejos {
@@ -181,49 +181,6 @@ export class MotorTransformadaFourier {
       frecuenciaMuestreo,
       cantidadMuestras: n,
       ventana: tipoVentana,
-    };
-  }
-
-  /**
-   * Medidas sobre el espectro: pico, centroide y ancho de banda ocupado
-   * (banda que contiene la fracción indicada de la potencia, excluyendo
-   * colas iguales a cada lado).
-   */
-  static analizar(espectro: ResultadoEspectro, fraccionPotencia = 0.99): AnalisisEspectral {
-    const { frecuencias, amplitudes } = espectro;
-    let total = 0;
-    let momento = 0;
-    let indicePico = 0;
-    for (let k = 0; k < amplitudes.length; k++) {
-      const potencia = amplitudes[k] * amplitudes[k];
-      total += potencia;
-      momento += potencia * frecuencias[k];
-      if (amplitudes[k] > amplitudes[indicePico]) indicePico = k;
-    }
-    const cola = ((1 - fraccionPotencia) / 2) * total;
-    let acumulado = 0;
-    let limiteInferior = frecuencias[0] ?? 0;
-    let limiteSuperior = frecuencias[frecuencias.length - 1] ?? 0;
-    let inferiorEncontrado = false;
-    for (let k = 0; k < amplitudes.length; k++) {
-      acumulado += amplitudes[k] * amplitudes[k];
-      if (!inferiorEncontrado && acumulado >= cola) {
-        limiteInferior = frecuencias[k];
-        inferiorEncontrado = true;
-      }
-      if (acumulado >= total - cola) {
-        limiteSuperior = frecuencias[k];
-        break;
-      }
-    }
-    return {
-      frecuenciaPico: frecuencias[indicePico] ?? 0,
-      amplitudPico: amplitudes[indicePico] ?? 0,
-      frecuenciaCentroide: total > 0 ? momento / total : 0,
-      anchoBandaOcupado: Math.max(0, limiteSuperior - limiteInferior),
-      limiteInferior,
-      limiteSuperior,
-      fraccionPotencia,
     };
   }
 }
