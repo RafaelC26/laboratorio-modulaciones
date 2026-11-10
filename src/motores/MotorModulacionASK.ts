@@ -4,6 +4,7 @@ import { SenalDigital } from "@/clases/SenalDigital";
 import {
   amplitudSimboloASK,
   anchoBandaASK,
+  anchoLobuloPrincipalASK,
   energiaBitASK,
   esOOK,
   frecuenciaMaximaASK,
@@ -65,7 +66,8 @@ export class MotorModulacionASK implements MotorModulacion {
       { clave: "velocidadTransmision", nombre: "Velocidad de transmisión", simbolo: "V_t=1/T_{bit}", valor: vt, unidad: "bit/s" },
       { clave: "velocidadModulacion", nombre: "Velocidad de modulación", valor: vt, unidad: "Bd" },
       { clave: "ciclosBit", nombre: "Ciclos de portadora por bit", simbolo: "f_pT_{bit}", valor: ciclos, estado: esEnteroAproximado(ciclos) ? "normal" : "advertencia", complemento: true },
-      { clave: "anchoBanda", nombre: "Ancho de banda (nulo a nulo)", simbolo: "BW=2/T_{bit}", valor: anchoBandaASK(tb), unidad: "Hz", complemento: true },
+      { clave: "anchoBanda", nombre: "Ancho de banda", simbolo: "BW=1/T_{bit}", valor: anchoBandaASK(tb), unidad: "Hz", complemento: true },
+      { clave: "lobuloPrincipal", nombre: "Lóbulo principal (de nulo a nulo)", simbolo: "2/T_{bit}", valor: anchoLobuloPrincipalASK(tb), unidad: "Hz", complemento: true },
       { clave: "profundidad", nombre: "Profundidad de modulación", simbolo: String.raw`\frac{A_1-A_0}{A_1+A_0}`, valor: indiceModulacionASK(p), complemento: true },
       { clave: "energiaBit1", nombre: "Energía del bit 1", simbolo: "E_1", valor: e1, unidad: "J", complemento: true },
       { clave: "energiaBit0", nombre: "Energía del bit 0", simbolo: "E_0", valor: e0, unidad: "J", complemento: true },

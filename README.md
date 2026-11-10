@@ -13,7 +13,7 @@ Las señales se calculan muestra a muestra a partir de sus ecuaciones y se muest
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 ![Plotly](https://img.shields.io/badge/Plotly.js-2-3F4F75?logo=plotly&logoColor=white)
 ![KaTeX](https://img.shields.io/badge/KaTeX-0.19-329894)
-![Pruebas](https://img.shields.io/badge/pruebas-68%20Vitest-6E9F18?logo=vitest&logoColor=white)
+![Pruebas](https://img.shields.io/badge/pruebas-69%20Vitest-6E9F18?logo=vitest&logoColor=white)
 ![Vercel](https://img.shields.io/badge/desplegado%20en-Vercel-000000?logo=vercel&logoColor=white)
 
 </div>
@@ -92,7 +92,7 @@ En `src/formulas/`, cada fórmula indica su página del Tema 6 en `paginaTema6`.
 
 - **Parámetros:** la fase inicial `φp` y la fase de referencia `φ0`, que valen 0 por defecto, y las amplitudes `A1` y `A0` libres en ASK (con `A1 = Vp` y `A0 = 0` se obtiene la expresión del Tema 6).
 - **AM:** `Pp = Vp²/2R`, la eficiencia y la envolvente como curva.
-- **ASK:** `BW = 2/Tbit`, la energía por bit y la profundidad de modulación.
+- **ASK:** `BW = 1/Tbit`, que aplica a ASK el criterio que el Tema 6 da para PSK (p. 58), así ASK y 2PSK coinciden con el mismo tiempo de bit. También el lóbulo principal `2/Tbit` (de nulo a nulo), la energía por bit y la profundidad de modulación.
 - **PSK:** las componentes I/Q, la distancia mínima, la energía, la eficiencia espectral y el mapeo Gray.
 - **PSM:** la frecuencia instantánea, las rayas de Bessel y la regla de Carson.
 - **Análisis:** la FFT y el criterio `fs ≥ 10·fmax`.

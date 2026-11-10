@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { ParametrosModulacion } from "@/clases/ParametrosModulacion";
 import { SenalDigital } from "@/clases/SenalDigital";
-import { amplitudSimboloASK, anchoBandaASK, energiaBitASK, esOOK, senalModuladaASK, velocidadTransmisionASK } from "@/formulas/formulasASK";
+import {
+  amplitudSimboloASK,
+  anchoBandaASK,
+  anchoLobuloPrincipalASK,
+  energiaBitASK,
+  esOOK,
+  senalModuladaASK,
+  velocidadTransmisionASK,
+} from "@/formulas/formulasASK";
+import { anchoBandaPSK } from "@/formulas/formulasPSK";
 import { MotorModulacionASK } from "@/motores/MotorModulacionASK";
 import { MotorMuestreo } from "@/motores/MotorMuestreo";
 import type { EntradaASK } from "@/tipos/tiposModulacion";
@@ -44,8 +53,15 @@ describe("Fórmulas ASK (Tema 6, p. 49–51)", () => {
 
   it("calcula velocidad de transmisión, ancho de banda y energía por bit", () => {
     expect(velocidadTransmisionASK(0.005)).toBeCloseTo(200, 10);
-    expect(anchoBandaASK(0.005)).toBeCloseTo(400, 10);
+    expect(anchoBandaASK(0.005)).toBeCloseTo(200, 10);
+    expect(anchoLobuloPrincipalASK(0.005)).toBeCloseTo(400, 10);
     expect(energiaBitASK(2, 0.01)).toBeCloseTo(0.02, 15);
+  });
+
+  it("con el mismo T_bit, ASK y 2PSK tienen el mismo ancho de banda BW = 1/T_bit", () => {
+    for (const tBit of [0.001, 0.002, 0.005]) {
+      expect(anchoBandaASK(tBit)).toBeCloseTo(anchoBandaPSK(tBit), 10);
+    }
   });
 
   it("el motor genera la señal muestra a muestra según la secuencia 10110", () => {
@@ -74,5 +90,8 @@ describe("Fórmulas ASK (Tema 6, p. 49–51)", () => {
     // Durante el primer bit (1) coincide con la portadora.
     for (let n = 0; n < 500; n += 37) expect(datos.modulada.amplitudes[n]).toBeCloseTo(datos.portadora.amplitudes[n], 12);
     expect(datos.constelacion.map((p) => p.repeticiones)).toEqual([2, 3]);
+    expect(datos.metricas.find((m) => m.clave === "anchoBanda")?.valor).toBeCloseTo(200, 10);
+    expect(datos.metricas.find((m) => m.clave === "lobuloPrincipal")?.valor).toBeCloseTo(400, 10);
+    expect(datos.resumen.anchoBandaEstimado).toBeCloseTo(200, 10);
   });
 });

@@ -35,8 +35,16 @@ export function velocidadTransmisionASK(duracionBit: number): number {
   return 1 / duracionBit;
 }
 
-/** Ancho del lóbulo principal (nulo a nulo) con pulsos rectangulares: BW = 2 / T_bit */
+/**
+ * BW = 1 / T_bit. El Tema 6 no da una fórmula para ASK; se usa el mismo criterio
+ * que da para PSK (BW = 1/T, p. 58), así ASK y 2PSK coinciden con el mismo T_bit.
+ */
 export function anchoBandaASK(duracionBit: number): number {
+  return 1 / duracionBit;
+}
+
+/** Ancho del lóbulo principal (de nulo a nulo, entre f_p ± 1/T_bit) con pulsos rectangulares: 2 / T_bit */
+export function anchoLobuloPrincipalASK(duracionBit: number): number {
   return 2 / duracionBit;
 }
 
@@ -124,12 +132,21 @@ export const formulasASK: ConjuntoFormulas = {
     },
     {
       identificador: "ask-ancho-banda",
-      nombre: "Ancho de banda (lóbulo principal)",
-      ecuacion: String.raw`BW\approx\frac{2}{T_{bit}}`,
+      nombre: "Ancho de banda",
+      ecuacion: String.raw`BW=\frac{1}{T_{bit}}`,
       variables: [],
-      descripcion: "De nulo a nulo con pulsos rectangulares. El Tema 6 solo muestra la forma sen x/x (p. 50–51).",
+      descripcion: "El Tema 6 no da una fórmula para ASK: se aplica la misma que usa en PSK (BW = 1/T, p. 58).",
       unidad: "Hz",
-      version: "2.0.0",
+      version: "2.1.0",
+    },
+    {
+      identificador: "ask-lobulo-principal",
+      nombre: "Lóbulo principal (de nulo a nulo)",
+      ecuacion: String.raw`\frac{2}{T_{bit}}`,
+      variables: [],
+      descripcion: "Distancia entre los primeros nulos f_p ± 1/T_bit con pulsos rectangulares. El Tema 6 solo muestra la forma sen x/x (p. 50–51).",
+      unidad: "Hz",
+      version: "2.1.0",
     },
     {
       identificador: "ask-energia",
